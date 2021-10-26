@@ -1,5 +1,5 @@
 {
-    "name": "ovgso-cdpp-components",
+    "name": "opse-metadatabloc-components",
     "version": "0.1.0",
     "private": true,
     "main": "src/lib/modules/index.js",
