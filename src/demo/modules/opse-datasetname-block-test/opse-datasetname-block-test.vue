@@ -1,6 +1,6 @@
 <template>
     <section>
-        <opse-datasetname-block :metadata="metadata1" :theme="theme" language="en"></opse-datasetname-block>
+        <opse-datasetname-block :metadata="metadata1" :theme="theme" :isEditionAllowed="true"></opse-datasetname-block>
     </section>
 </template>
 
@@ -14,13 +14,8 @@ export default {
     data() {
     return {
       metadata1: {
-        links:[
-          {type:"HTTP_DOWNLOAD_LINK",
-           url:"https://services.sedoo.fr/",
-           name:"",
-           description:{en:"Dataset name"}
-          },
-          ]
+        resourceDatasetName: null
+        
         },
       theme: {
         primaryColor: "#f39c12",

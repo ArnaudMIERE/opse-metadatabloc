@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 
 import myProjectFakeBlockTest from "@/demo/modules/myproject-fake-block-test/myproject-fake-block-test.vue";
 import opseDatasetNameBlockTest from "@/demo/modules/opse-datasetname-block-test/opse-datasetname-block-test.vue";
+import opseDownloadBlockTest from "@/demo/modules/opse-download-block-test/opse-download-block-test.vue";
 
 Vue.use(VueRouter)
 
@@ -14,6 +15,10 @@ const routes = [
 {
     path: "/opse-datasetname-block",
     component: opseDatasetNameBlockTest,
+},
+{
+    path:"/opse-download-block",
+    component: opseDownloadBlockTest,
 }
 ];
 
