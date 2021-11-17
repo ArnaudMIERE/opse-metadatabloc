@@ -17,7 +17,7 @@ export default {
         links:[
           {type:"HTTP_DOWNLOAD_LINK",
            //url:"https://services.sedoo.fr/opse/data/v1_0/download?collectionId=",
-           url: "http://localhost:8604/data/download?collectionId=73bbe692-584b-11e3-0015-ce3f5508acd9",
+           url: "http://localhost:8604/data/download?collectionId=389bbea0-7279-12c1-63d0-cfc4a77ded87",
            name:"",
            description: null
           },
