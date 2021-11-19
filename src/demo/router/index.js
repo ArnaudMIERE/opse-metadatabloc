@@ -5,6 +5,8 @@ import myProjectFakeBlockTest from "@/demo/modules/myproject-fake-block-test/myp
 import opseDatasetNameBlockTest from "@/demo/modules/opse-datasetname-block-test/opse-datasetname-block-test.vue";
 import opseDownloadBlockTest from "@/demo/modules/opse-download-block-test/opse-download-block-test.vue";
 import opseYearBasedDownloadBlockTest from "@/demo/modules/opse-year-based-download-block-test/opse-year-based-download-block-test.vue";
+import opseDataNetcdfBlockTest from "@/demo/modules/opse-data-netcdf-block-test/opse-data-netcdf-block-test.vue";
+
 
 Vue.use(VueRouter)
 
@@ -24,6 +26,11 @@ const routes = [
 {
     path:"/opse-year-based-download-block",
     component: opseYearBasedDownloadBlockTest,
+},
+
+{
+    path:"/opse-data-netcdf-block",
+    component: opseDataNetcdfBlockTest,
 }
 ];
 
