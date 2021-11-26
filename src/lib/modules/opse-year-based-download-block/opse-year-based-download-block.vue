@@ -29,6 +29,10 @@
                 <v-icon large left style="color:#F39C12">mdi-database</v-icon>
                 <span>{{ $t('opseAccessData') }}</span>
             </v-card-title>
+            
+            <p>To download the data files, you should agree with the Data Policy.</p>
+            
+            <p><v-checkbox v-model="dataPolicy" label="I agree with the Data Policy" hide-details></v-checkbox></p>
             <span class="explication">{{ $t("explicationText") }}</span>
             <article>
                 <v-btn-toggle
@@ -39,7 +43,7 @@
                     class="d-flex align-center flex-row flex-wrap"
                 >
                 <v-btn v-for="(year, index) in years" 
-                         :key="index" :value="year" text >
+                         :key="index" :value="year" text :disabled="!dataPolicy">
                     <section  >
                       <div class="label-year font-weight-thin rounded-5">
                         {{ $t("year") }}                        
@@ -51,7 +55,7 @@
                 </v-btn>
                 </v-btn-toggle>
               </article>
-    <v-btn color="warning" class="ma-4" @click="downloadAll()" :disabled="!url || !downloadAllowed">{{ $t('downloadAll') }}</v-btn>
+    <v-btn color="warning" class="ma-4" @click="downloadAll()" :disabled="!url || !downloadAllowed || !dataPolicy">{{ $t('downloadAll') }}</v-btn>
     <v-btn color="warning" class="ma-4" @click="downloadSelected()" :disabled="!url || selectedYears.length==0 || !downloadAllowed">{{ $t('downloadSelected') }}</v-btn>
         </v-card>
     </div>
@@ -64,6 +68,7 @@ export default {
 
     data(){
         return{
+        dataPolicy: false,
         years: [], 
         selectedYears: [],
         currentStatus: "PREPARING_REQUEST",
@@ -172,7 +177,7 @@ export default {
         },
 
         downloadSelected(){
-        window.open(this.url+"download?collectionId="+this.metadata.id+"&filter=year_"+this.selectedYears.join("_"));
+        window.open(this.url+"downloadYear?collectionId="+this.metadata.id+"&filter=year_"+this.selectedYears.join("_"));
         },
 
         loadYears() {

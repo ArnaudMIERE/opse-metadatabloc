@@ -1,25 +1,51 @@
 <i18n  >
 {
   "en": {
-       "opseDataList":"Files List"
+       "opseDataList":"Files List",
+       "opseConvert": "Convert NetCDF",
+       "opseDelete": "Delete",
+       "opseConfirmation": "Confirmation",
+       "opseConfirmationDelete": "Do you confirm this deletion ?",
+       "opseConfirm": "Confirm",
+       "opseCancel": "Cancel"
   },
   "fr": {
-      "opseDataList": "Liste de fichiers"
+      "opseDataList": "Liste de fichiers",
+      "opseConvert": "Convertir NetCDF",
+      "opseDelete": "Supprimer",
+      "opseConfirmation": "Confirmation",
+      "opseConfirmationDelete": "Confirmez-vous cette suppression ?",
+      "opseConfirm": "Confirmer",
+      "opseCancel": "Annuler"
   }
 }
 </i18n>
 
 <template>
+
 <v-app class="transparent">
+
+  <v-dialog v-model="deletionDialog" persistent max-width="290">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between blue-grey lighten-5"> <span class="headline">{{ $t('opseConfirmation') }}</span>
+        <v-btn fab text @click="deletionDialog = false" > <v-icon>mdi-close</v-icon> </v-btn></v-card-title>
+        <v-card-text>{{ $t('opseConfirmationDelete') }}</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn small outlined color="success"  flat @click="confirmeDelete()">{{$t('opseConfirm')}}</v-btn>
+          <v-btn small outlined color="error"  flat @click="deletionDialog = false">{{$t('opseCancel')}}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
 <v-snackbar v-model="notifier" top :color="notifierColor" :timeout="timeout"  >
       {{ notifierMessage }}
-      <v-btn dark   @click="notifier = false" > Close </v-btn>
+      <v-btn text @click="notifier = false" > <v-icon>mdi-close</v-icon> </v-btn>
 </v-snackbar>
 
-    <v-card v-if="isVisible" :style="applyTheme" >
+    <v-card v-if="isVisible" :style="applyTheme" max-width="600">
     <v-card-title>
-         Files
+        <v-icon large left style="color:#F39C12">mdi-file</v-icon>Files
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -33,20 +59,20 @@
       :headers="headers"
       :items="dataFile"
       :search="search"
+      class="elevation-1"
     >
-    <!--template v-slot:default="props">
-        <tr v-for="file in props.items" :key="file" :value="dataFile">
-            <td class="dense text-xs-left">
-                {{file}}
-            </td>
-            
-        </tr>
-    </template-->
+    
 
-    <template v-slot:items="props">
+    <template v-slot:item="{item}">
         <tr>
             <td class="dense text-xs-left">
-                {{props.item.name}} dcsdd
+                {{item.name}}
+                <span></span>
+            </td>
+            <td>
+                <v-btn small outlined color="success">{{ $t('opseConvert') }}</v-btn>
+
+                <v-btn icon @click="confirmDeletion(item.name)"><v-icon color="error" title="Delete" >  mdi-trash-can </v-icon></v-btn>
             </td>
         </tr>
     </template>
@@ -54,8 +80,12 @@
     
     
     </v-data-table>
+    <div class="text-center">
+     <v-btn icon><v-icon color="error" title="Delete all" >  mdi-trash-can </v-icon></v-btn>
+    </div>
   </v-card>
   </v-app>
+  
 </template>
 
 
@@ -67,8 +97,10 @@ export default {
         return{
         search: '',
         dataFile:[],
+        fileName:'',
+        deletionDialog:false,
         headers: [
-        { text: "Files", value: "files" },
+        { text: "Files", value: "name"},
         { text: "Actions", value: "action", sortable: false }
         ],
         notifier: false,
@@ -104,6 +136,11 @@ export default {
   },
 
   computed: {
+
+      /*filerItems(){
+          
+      },*/
+
     applyTheme() {
       return applyPrimaryAndSecondaryColors(this.theme);
     },
@@ -150,6 +187,11 @@ export default {
 
   methods: {
 
+    confirmDeletion(file) {
+    this.fileName = file,
+    this.deletionDialog = true
+  },
+
       loadData() {
       let url = null
         if(this.metadata && this.metadata.links && this.metadata.links.length > 0) {
@@ -171,10 +213,32 @@ export default {
         url: this.url + "dataFiles?collection="+this.metadata.id,
       }).then(response => {
           if (response){
-        this.dataFile = response.data;
+        this.dataFile = response.data
+        
         console.log("Liste de fichiers",response.data)
         
           }
+      }).catch((error) => {
+        this.displayError("An error has occured:" + error)
+        console.log(error)
+        
+        })
+      .finally(() => {
+          this.loading = false
+      });
+
+    },
+
+    confirmeDelete(){
+      console.log(this.url + "delete?collection="+this.metadata.id+"&fileName="+this.fileName)
+      this.axios({
+        method: "delete",
+        url: this.url + "delete?collection="+this.metadata.id+"&fileName="+this.fileName,
+      }).then(response => {
+        if (response)
+          this.displaySuccess("File deleted")
+          this.loadData();
+          this.deletionDialog=false
       }).catch((error) => {
         this.displayError("An error has occured:" + error)
         console.log(error)
@@ -195,7 +259,7 @@ export default {
 
     displaySuccess(message){
         this.notifierMessage = message
-        this.notifierColor = 'error'
+        this.notifierColor = 'success'
         this.timeout=8000
         this.notifier = true
     }
