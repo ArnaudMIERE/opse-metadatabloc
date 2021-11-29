@@ -6,6 +6,7 @@
        "opseDelete": "Delete",
        "opseConfirmation": "Confirmation",
        "opseConfirmationDelete": "Do you confirm this deletion ?",
+       "opseConfirmationDeleteAll": "Do you confirm deletion of all files ?",
        "opseConfirm": "Confirm",
        "opseCancel": "Cancel"
   },
@@ -15,6 +16,7 @@
       "opseDelete": "Supprimer",
       "opseConfirmation": "Confirmation",
       "opseConfirmationDelete": "Confirmez-vous cette suppression ?",
+      "opseConfirmationDeleteAll":"Confirmez-vous la suppression de tous les fichiers ?",
       "opseConfirm": "Confirmer",
       "opseCancel": "Annuler"
   }
@@ -32,8 +34,21 @@
         <v-card-text>{{ $t('opseConfirmationDelete') }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn small outlined color="success"  flat @click="confirmeDelete()">{{$t('opseConfirm')}}</v-btn>
-          <v-btn small outlined color="error"  flat @click="deletionDialog = false">{{$t('opseCancel')}}</v-btn>
+          <v-btn small outlined color="success"   @click="confirmeDelete()">{{$t('opseConfirm')}}</v-btn>
+          <v-btn small outlined color="error"   @click="deletionDialog = false">{{$t('opseCancel')}}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="deletionDialogAll" persistent max-width="290">
+      <v-card>
+        <v-card-title class="d-flex justify-space-between blue-grey lighten-5"> <span class="headline">{{ $t('opseConfirmation') }}</span>
+        <v-btn fab text @click="deletionDialogAll = false" > <v-icon>mdi-close</v-icon> </v-btn></v-card-title>
+        <v-card-text>{{ $t('opseConfirmationDeleteAll') }}</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn small outlined color="success"   @click="deleteAll()">{{$t('opseConfirm')}}</v-btn>
+          <v-btn small outlined color="error"   @click="deletionDialogAll = false">{{$t('opseCancel')}}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -59,7 +74,7 @@
       :headers="headers"
       :items="dataFile"
       :search="search"
-      class="elevation-1"
+      class="elevation-0"
     >
     
 
@@ -80,8 +95,8 @@
     
     
     </v-data-table>
-    <div class="text-center">
-     <v-btn icon><v-icon color="error" title="Delete all" >  mdi-trash-can </v-icon></v-btn>
+    <div>
+     <v-btn color="error" dark @click="deletionDialogAll=true"> <v-icon dark title="Delete all" @click="deletionDialogAll=true">  mdi-trash-can </v-icon>{{$t('opseDelete')}}</v-btn>
     </div>
   </v-card>
   </v-app>
@@ -99,6 +114,7 @@ export default {
         dataFile:[],
         fileName:'',
         deletionDialog:false,
+        deletionDialogAll: false,
         headers: [
         { text: "Files", value: "name"},
         { text: "Actions", value: "action", sortable: false }
@@ -239,6 +255,27 @@ export default {
           this.displaySuccess("File deleted")
           this.loadData();
           this.deletionDialog=false
+      }).catch((error) => {
+        this.displayError("An error has occured:" + error)
+        console.log(error)
+        
+        })
+      .finally(() => {
+          this.loading = false
+      });
+
+    },
+
+    deleteAll(){
+      console.log(this.url + "delete")
+      this.axios({
+        method: "delete",
+        url: this.url + "deleteAll?collection="+this.metadata.id,
+      }).then(response => {
+        if (response)
+          this.displaySuccess("Files deleted")
+          this.loadData();
+          this.deletionDialogAll=false
       }).catch((error) => {
         this.displayError("An error has occured:" + error)
         console.log(error)
