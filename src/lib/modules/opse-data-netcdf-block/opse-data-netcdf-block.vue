@@ -8,7 +8,10 @@
        "opseConfirmationDelete": "Do you confirm this deletion ?",
        "opseConfirmationDeleteAll": "Do you confirm deletion of all files ?",
        "opseConfirm": "Confirm",
-       "opseCancel": "Cancel"
+       "opseCancel": "Cancel",
+       "opseSelectFile": "Select files",
+       "opseListFile": "List of files",
+       "opseUpload": "Upload"
   },
   "fr": {
       "opseDataList": "Liste de fichiers",
@@ -18,7 +21,10 @@
       "opseConfirmationDelete": "Confirmez-vous cette suppression ?",
       "opseConfirmationDeleteAll":"Confirmez-vous la suppression de tous les fichiers ?",
       "opseConfirm": "Confirmer",
-      "opseCancel": "Annuler"
+      "opseCancel": "Annuler",
+      "opseSelectFile": "Sélectionnez des fichiers",
+      "opseListFile": "Liste de fichiers",
+      "opseUpload": "Upload"
   }
 }
 </i18n>
@@ -52,7 +58,25 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
+    <v-card max-width="600">
+      <v-card-title><v-icon large left style="color:#F39C12">mdi-hand-pointing-right</v-icon>{{$t('opseSelectFile')}}</v-card-title>
+      <v-file-input  show-size outlined counter multiple prepend-icon="mdi-upload"  label="File input" :value="datasetFileInput" v-model="files">
+        <template v-slot:selection="{ text }">
+      <v-chip
+        small
+        label
+        color="warning"
+      >
+        {{ text }}
+      </v-chip>
+    </template>
+      </v-file-input>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+          <v-btn color="success"  @click="upload()"><v-icon dark left title="Upload">mdi-folder-upload</v-icon>{{$t('opseUpload')}}</v-btn>
+      </v-card-actions>
+    </v-card>
+    <br/>
 <v-snackbar v-model="notifier" top :color="notifierColor" :timeout="timeout"  >
       {{ notifierMessage }}
       <v-btn text @click="notifier = false" > <v-icon>mdi-close</v-icon> </v-btn>
@@ -60,7 +84,7 @@
 
     <v-card v-if="isVisible" :style="applyTheme" max-width="600">
     <v-card-title>
-        <v-icon large left style="color:#F39C12">mdi-file</v-icon>Files
+        <v-icon large left style="color:#F39C12">mdi-file</v-icon>{{$t('opseListFile')}}
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -74,7 +98,7 @@
       :headers="headers"
       :items="dataFile"
       :search="search"
-      class="elevation-0"
+      class="elevation-1"
     >
     
 
@@ -95,9 +119,10 @@
     
     
     </v-data-table>
-    <div>
-     <v-btn color="error" dark @click="deletionDialogAll=true"> <v-icon dark title="Delete all" @click="deletionDialogAll=true">  mdi-trash-can </v-icon>{{$t('opseDelete')}}</v-btn>
-    </div>
+    <v-card-actions>
+          <v-spacer></v-spacer>
+     <v-btn color="error" dark @click="deletionDialogAll=true"> <v-icon dark left title="Delete all" @click="deletionDialogAll=true">  mdi-trash-can </v-icon>{{$t('opseDelete')}}</v-btn>
+    </v-card-actions>
   </v-card>
   </v-app>
   
@@ -110,6 +135,9 @@ export default {
     name: "opse-data-netcdf-block",
     data() {
         return{
+        files: [],
+        datasetFile: null,
+        datasetFileInput: "",
         search: '',
         dataFile:[],
         fileName:'',
@@ -152,11 +180,7 @@ export default {
   },
 
   computed: {
-
-      /*filerItems(){
-          
-      },*/
-
+      
     applyTheme() {
       return applyPrimaryAndSecondaryColors(this.theme);
     },
@@ -184,6 +208,15 @@ export default {
             }
         }
         return links
+    },
+
+    disableConfirmUpload() {
+      if (this.files){
+        console.log("this.files ",this.files)
+        return true;
+      }
+      return false;
+      
     },
   },
 
@@ -287,17 +320,51 @@ export default {
 
     },
 
+      
+    upload(){
+      if (this.files){
+        this.datasetFile = new FormData();
+        for (var i=0; i<this.files.length; i++){
+          this.datasetFile.append("file", this.files[i])
+        }
+      
+    
+      this.axios({
+        method: "post",
+        url: this.url + "upload?collection="+this.metadata.id,
+        data:this.datasetFile,
+        headers: {'Content-Type': 'multipart/form-data' }
+      }).then(response => {
+        if (response)
+          this.displaySuccess("File uploaded")
+          this.loadData();
+          this.datasetFileInput = "";
+          
+      }) 
+      
+      .catch((error) => {
+        this.displayError("An error has occured:" + error)
+        console.log(error)
+        
+        })
+      .finally(() => {
+          this.loading = false
+      });
+    }
+    },
+    
+
     displayError(message){
         this.notifierMessage = message
         this.notifierColor = 'error'
-          this.timeout=8000
+          this.timeout=2000
           this.notifier = true
     },
 
     displaySuccess(message){
         this.notifierMessage = message
         this.notifierColor = 'success'
-        this.timeout=8000
+        this.timeout=2000
         this.notifier = true
     }
 
