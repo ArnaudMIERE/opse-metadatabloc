@@ -6,7 +6,8 @@
     "explicationText": "Select the years you want to download.",
     "year": "Year",
     "downloadAll": "Download All years",
-    "downloadSelected": "Download selected years"        
+    "downloadSelected": "Download selected years",
+    "opseAlert":"No data available yet."        
 
   },
   "fr": {
@@ -15,7 +16,8 @@
     "explicationText": "Selectionnez les années que vous voulez télécharger (tous les paramètres sont sélectionés par défaut).",
     "year": "Année",
     "downloadAll": "Télécharger",
-    "downloadSelected": "Télécharger la sélection"
+    "downloadSelected": "Télécharger la sélection",
+    "opseAlert":"Aucune donnée n'est encore disponible."
     
 
   }
@@ -24,15 +26,16 @@
 
 <template>
     <div>
-        <v-card v-if="!isVisible" :style="applyTheme" :flat="true">
+        <v-card v-if="isVisible" :style="applyTheme" :flat="true">
             <v-card-title>
                 <v-icon large left style="color:#F39C12">mdi-database</v-icon>
                 <span>{{ $t('opseAccessData') }}</span>
             </v-card-title>
             
             <p>To download the data files, you should agree with the Data Policy.</p>
-            
-            <p><v-checkbox v-model="dataPolicy" label="I agree with the Data Policy" hide-details></v-checkbox></p>
+            <!--p v-if="downloadAllowed"> No data availaible</p-->
+            <v-alert v-if="downloadAllowed" dense outlined type="error">{{$t('opseAlert')}}</v-alert>
+            <p><v-checkbox v-model="dataPolicy" label="I agree with the Data Policy" hide-details :disabled="downloadAllowed"></v-checkbox></p>
             <span class="explication">{{ $t("explicationText") }}</span>
             <article>
                 <v-btn-toggle
@@ -55,8 +58,8 @@
                 </v-btn>
                 </v-btn-toggle>
               </article>
-    <v-btn color="warning" class="ma-4" @click="downloadAll()" :disabled="!url || !downloadAllowed || !dataPolicy">{{ $t('downloadAll') }}</v-btn>
-    <v-btn color="warning" class="ma-4" @click="downloadSelected()" :disabled="!url || selectedYears.length==0 || !downloadAllowed">{{ $t('downloadSelected') }}</v-btn>
+    <v-btn color="warning" class="ma-4" @click="downloadAll()" :disabled="!url || downloadAllowed || !dataPolicy">{{ $t('downloadAll') }}</v-btn>
+    <v-btn color="warning" class="ma-4" @click="downloadSelected()" :disabled="!url || selectedYears.length==0 || downloadAllowed">{{ $t('downloadSelected') }}</v-btn>
         </v-card>
     </div>
 </template>
@@ -107,6 +110,9 @@ export default {
 
     isVisible() {
         let isVisible = false
+        if(this.url != null) {
+            isVisible = true
+        }
         
         this.$emit("getVisibility", {
         name: this.$options.name,
@@ -117,7 +123,7 @@ export default {
     },
 
     downloadAllowed() {
-      if(this.metadata && this.metadata.length > 0) {
+      if(this.years && this.years.length > 0) {
         return false
       } else {
         return true
@@ -173,11 +179,11 @@ export default {
 
         downloadAll(){
         //this.download(this.url+"download?collectionId="+this.metadata.id)
-        window.open(this.url+"download?collectionId="+this.metadata.id)
+        window.open(this.url+"/download?collectionId="+this.metadata.id)
         },
 
         downloadSelected(){
-        window.open(this.url+"downloadYear?collectionId="+this.metadata.id+"&filter=year_"+this.selectedYears.join("_"));
+        window.open(this.url+"/downloadYear?collectionId="+this.metadata.id+"&filter=year_"+this.selectedYears.join("_"));
         },
 
         loadYears() {

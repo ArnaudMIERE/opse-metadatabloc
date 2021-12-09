@@ -17,14 +17,14 @@ export default {
         id: "389bbea0-7279-12c1-63d0-cfc4a77ded87",
         links:[
           {"type":"OPENSEARCH_LINK","url":"http://localhost:8604/data/","name":"","description":{"en":"Opensearch data access","fr":""}},
-          ],
+          ]
         
         },
       theme: {
         primaryColor: "#f39c12",
         secondaryColor: "#AAA"
       }
-    };
+    }
   }
     
 }
