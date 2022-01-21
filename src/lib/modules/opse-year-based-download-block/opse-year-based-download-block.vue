@@ -31,7 +31,13 @@
                 <v-icon large left style="color:#F39C12">mdi-database</v-icon>
                 <span>{{ $t('opseAccessData') }}</span>
             </v-card-title>
-            
+            <p>Select Data format</p>
+            <v-radio-group v-model="folderFile" column >
+              <v-radio label="Netcdf" value="/data/netcdf" @click="loadYears(folderFile)"></v-radio>
+              <v-radio label="CSV" value="/data/csv" @click="loadYears(folderFile)"></v-radio>
+              <!--v-radio label="GEOJSON" value="/data/geojson" @click="loadYears(folderFile)"></v-radio>
+              <v-radio label="SHAPE" value="/data/shp" @click="loadYears(folderFile)"></v-radio-->
+            </v-radio-group>
             <p>To download the data files, you should agree with the Data Policy.</p>
             <!--p v-if="downloadAllowed"> No data availaible</p-->
             <v-alert v-if="downloadAllowed" dense outlined type="error">{{$t('opseAlert')}}</v-alert>
@@ -58,8 +64,8 @@
                 </v-btn>
                 </v-btn-toggle>
               </article>
-    <v-btn color="warning" class="ma-4" @click="downloadAll()" :disabled="!url || downloadAllowed || !dataPolicy">{{ $t('downloadAll') }}</v-btn>
-    <v-btn color="warning" class="ma-4" @click="downloadSelected()" :disabled="!url || selectedYears.length==0 || downloadAllowed">{{ $t('downloadSelected') }}</v-btn>
+    <v-btn color="warning" class="ma-4" @click="downloadAll(folderFile)" :disabled="!url || downloadAllowed || !dataPolicy">{{ $t('downloadAll') }}</v-btn>
+    <v-btn color="warning" class="ma-4" @click="downloadSelected(folderFile)" :disabled="!url || selectedYears.length==0 || downloadAllowed">{{ $t('downloadSelected') }}</v-btn>
         </v-card>
     </div>
 </template>
@@ -76,6 +82,7 @@ export default {
         selectedYears: [],
         currentStatus: "PREPARING_REQUEST",
         url: null,
+        folderFile: "/data/netcdf"
 
         }
     },
@@ -123,9 +130,10 @@ export default {
     },
 
     downloadAllowed() {
-      if(this.years && this.years.length > 0) {
+      if(this.years && this.years.length > 0 ) {
         return false
       } else {
+      
         return true
       }
 
@@ -146,10 +154,15 @@ export default {
 
   created() {
    this.$i18n.locale = this.language;
-   this.loadYears()
+   //this.loadYears()
+   this.file()
   },
 
     methods:{
+
+      file(){
+        this.loadYears(this.folderFile)
+      },
 
               
         download(url) {
@@ -177,16 +190,16 @@ export default {
       });
     },
 
-        downloadAll(){
+        downloadAll(index){
         //this.download(this.url+"download?collectionId="+this.metadata.id)
-        window.open(this.url+"/download?collectionId="+this.metadata.id)
+        window.open(this.url+"data/v1_0/download?collectionId="+this.metadata.id+"&folder="+index)
         },
 
-        downloadSelected(){
-        window.open(this.url+"/downloadYear?collectionId="+this.metadata.id+"&filter=year_"+this.selectedYears.join("_"));
+        downloadSelected(index){
+        window.open(this.url+"data/v1_0/downloadYear?collectionId="+this.metadata.id+"&folder="+index+"&filter=year_"+this.selectedYears.join("_"));
         },
 
-        loadYears() {
+        loadYears(index) {
       let url = null
         if(this.metadata && this.metadata.links && this.metadata.links.length > 0) {
             for(let i=0 ; i < this.metadata.links.length ; i++) {
@@ -201,15 +214,22 @@ export default {
           return
         }
 
+        
+
       this.loading = true
+      console.log("url ",this.url + "data/v1_0/request?collection="+this.metadata.id+"&folder="+index)
       this.axios({
         method: "get",
-        url: this.url + "/request?collection="+this.metadata.id,
+        url: this.url + "data/v1_0/request?collection="+this.metadata.id+"&folder="+index,
+         //url: this.url + "/request?collection="+this.metadata.id,
       }).then(response => {
         this.years = []
+        console.log("Response",response.data)
+       
         for(let i=0 ; i<response.data.entries.length ; i++) {
             this.years.push(response.data.entries[i].date.substring(0,4))
         }
+        
       }).catch((error) => {
         // this.displayError("An error has occured:" + error)
         console.log(error)
@@ -219,8 +239,8 @@ export default {
           this.loading = false
       });
 
-    }
-
+    },
+    
     },
     
 }
