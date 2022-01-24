@@ -259,7 +259,7 @@ export default {
       this.loading = true
       this.axios({
         method: "get",
-        url: this.url + "dataFiles?collection="+this.metadata.id,
+        url: this.url + "/dataFiles?collection="+this.metadata.id,
       }).then(response => {
           if (response){
         this.dataFile = response.data
@@ -279,10 +279,10 @@ export default {
     },
 
     confirmeDelete(){
-      console.log(this.url + "delete?collection="+this.metadata.id+"&fileName="+this.fileName)
+      console.log(this.url + "/delete?collection="+this.metadata.id+"&fileName="+this.fileName)
       this.axios({
         method: "delete",
-        url: this.url + "delete?collection="+this.metadata.id+"&fileName="+this.fileName,
+        url: this.url + "/delete?collection="+this.metadata.id+"&fileName="+this.fileName,
       }).then(response => {
         if (response)
           this.displaySuccess("File deleted")
@@ -303,7 +303,7 @@ export default {
       console.log(this.url + "delete")
       this.axios({
         method: "delete",
-        url: this.url + "deleteAll?collection="+this.metadata.id,
+        url: this.url + "/deleteAll?collection="+this.metadata.id,
       }).then(response => {
         if (response)
           this.displaySuccess("Files deleted")
@@ -331,7 +331,7 @@ export default {
     
       this.axios({
         method: "post",
-        url: this.url + "upload?collection="+this.metadata.id,
+        url: this.url + "/upload?collection="+this.metadata.id,
         data:this.datasetFile,
         headers: {'Content-Type': 'multipart/form-data' }
       }).then(response => {

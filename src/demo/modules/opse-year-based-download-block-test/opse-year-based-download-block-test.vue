@@ -16,7 +16,7 @@ export default {
       metadata1: {
         id: "389bbea0-7279-12c1-63d0-cfc4a77ded87",
         links:[
-          {"type":"OPENSEARCH_LINK","url":"http://localhost:8604/data/","name":"","description":{"en":"Opensearch data access","fr":""}},
+          {"type":"OPENSEARCH_LINK","url":"http://localhost:8604/","name":"","description":{"en":"Opensearch data access","fr":"en"}},
           ]
         
         },

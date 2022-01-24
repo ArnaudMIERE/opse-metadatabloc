@@ -82,7 +82,8 @@ export default {
         selectedYears: [],
         currentStatus: "PREPARING_REQUEST",
         url: null,
-        folderFile: "/data/netcdf"
+        folderFile: "/data/netcdf",
+        test:'test'
 
         }
     },
