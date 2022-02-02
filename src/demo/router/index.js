@@ -7,7 +7,7 @@ import opseDownloadBlockTest from "@/demo/modules/opse-download-block-test/opse-
 import opseYearBasedDownloadBlockTest from "@/demo/modules/opse-year-based-download-block-test/opse-year-based-download-block-test.vue";
 import opseDataNetcdfBlockTest from "@/demo/modules/opse-data-netcdf-block-test/opse-data-netcdf-block-test.vue";
 
-
+import opseThumbnailsDisplayedBlockTest from "@/demo/modules/opse-thumbnails-displayed-block-test/opse-thumbnails-displayed-block-test.vue";
 Vue.use(VueRouter)
 
 const routes = [
@@ -31,6 +31,11 @@ const routes = [
 {
     path:"/opse-data-netcdf-block",
     component: opseDataNetcdfBlockTest,
+},
+
+{
+    path:"/opse-thumbnails-displayed-block",
+    component: opseThumbnailsDisplayedBlockTest,
 }
 ];
 

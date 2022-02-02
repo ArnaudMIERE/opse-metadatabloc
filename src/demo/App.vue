@@ -8,7 +8,8 @@
       <v-chip class="mx-2"><router-link to="/opse-datasetname-block">/opse-datasetname-block</router-link></v-chip>
       <v-chip class="mx-2"><router-link to="/opse-download-block">/opse-download-block</router-link></v-chip>
       <v-chip class="mx-2"><router-link to="/opse-year-based-download-block">/opse-year-based-download-block</router-link></v-chip>
-       <v-chip class="mx-2"><router-link to="/opse-data-netcdf-block">/opse-data-netcdf-block</router-link></v-chip>
+      <v-chip class="mx-2"><router-link to="/opse-data-netcdf-block">/opse-data-netcdf-block</router-link></v-chip>
+      <v-chip class="mx-2"><router-link to="/opse-thumbnails-displayed-block">/opse-thumbnails-displayed-block</router-link></v-chip> 
 
     </div>
     <router-view></router-view>

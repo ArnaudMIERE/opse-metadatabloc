@@ -1,7 +1,7 @@
 <i18n  >
 {
   "en": {
-    "opseAccessData": "Data access",
+    "opseAccessData": "Data vizualisation",
     "opseDownload": "Download",
     "explicationText": "Select the years you want to download (all years are selected by default).",
     "explicationTextParams": "Select the params you want to download (all params are selected by default).",
@@ -13,7 +13,7 @@
 
   },
   "fr": {
-    "opseAccessData": "Accès aux données",
+    "opseAccessData": "Visualisation des données",
     "opseDownload": "Téléchargement",
     "explicationText": "Selectionnez les années que vous voulez télécharger (toutes les années sont sélectionées par défaut).",
     "explicationTextParams": "Selectionnez les paramètres que vous voulez télécharger (tous les paramètres sont sélectionés par défaut).",
@@ -38,18 +38,47 @@
       <p>Select Data format</p>
       <v-radio-group v-model="folderFile" column>
         <v-radio
-          label="Netcdf"
-          value="/data/netcdf"
-          @click="loadYears(folderFile)"
+          label="RGB"
+          value="/thumnails/RGB"
+          @click="loadImage(folderFile)"
         ></v-radio>
         <v-radio
-          label="CSV"
-          value="/data/csv"
-          @click="loadYears(folderFile)"
+          label="MS"
+          value="/thumnails/MS"
+          @click="loadImage(folderFile)"
         ></v-radio>
-        <!--v-radio label="GEOJSON" value="/data/geojson" @click="loadYears(folderFile)"></v-radio>
-              <v-radio label="SHAPE" value="/data/shp" @click="loadYears(folderFile)"></v-radio-->
+        <v-radio
+          label="MNE"
+          value="/thumnails/MNE"
+          @click="loadImage(folderFile)"
+        ></v-radio>
       </v-radio-group>
+      <div>
+        <v-row height="900px">
+          <v-col v-for="(item, index) in itemsPages" :key="index" class="d-flex child-flex" cols="3">
+            <v-img
+              :src=item
+              :lazy-src=item
+              aspect-ratio="1"
+              class="grey lighten-2"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="grey lighten-5"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+            </v-img>
+          </v-col>
+        </v-row>
+        
+      </div>
+      <div class="text-center">
+          <v-pagination class="pagination mb-2" v-model="page" :length="pages" @input="updatePage"></v-pagination>
+        </div>
+
       <p>To download the data files, you should agree with the Data Policy.</p>
       <!--p v-if="downloadAllowed"> No data availaible</p-->
       <v-alert v-if="downloadAllowed" dense outlined type="error">{{
@@ -63,41 +92,7 @@
           :disabled="downloadAllowed"
         ></v-checkbox>
       </p>
-      <span class="explication">{{ $t("explicationTextParams") }}</span>
-      <article>
-        <v-btn-toggle
-          v-model="selectedParams"
-          color="primary"
-          group
-          multiple
-          class="d-flex align-center flex-row flex-wrap"
-        >
-          <v-btn
-            v-for="(param, index) in params"
-            :key="index"
-            :value="param"
-            text
-            :disabled="!dataPolicy"
-          >
-            <section>
-              <div class="label-year font-weight-thin rounded-5">
-                {{ $t("param") }}
-              </div>
-              <div class="font-weight-black text-center d-flex align-center justify-space-around">
-                <v-tooltip bottom>
-                 <template v-slot:activator="{ on, attrs }">
-                <span v-bind="attrs" v-on="on"
-                      >
-                {{ param }}</span>
-                 </template>
-                 <span>{{ loadParamsName(param) }}</span>
-                </v-tooltip>
-              </div>
-              
-            </section>
-          </v-btn>
-        </v-btn-toggle>
-      </article>
+
       <span class="explication">{{ $t("explicationText") }}</span>
       <article>
         <v-btn-toggle
@@ -125,6 +120,7 @@
           </v-btn>
         </v-btn-toggle>
       </article>
+
       <v-btn
         color="warning"
         class="ma-4"
@@ -146,10 +142,11 @@
 <script>
 import { applyPrimaryAndSecondaryColors } from "../../utils";
 export default {
-  name: "opse-year-based-download-block",
+  name: "opse-thumbnails-displayed-block",
 
   data() {
     return {
+      prefix: "file:///",
       dataPolicy: false,
       years: [],
       params: [],
@@ -157,7 +154,14 @@ export default {
       selectedParams: [],
       currentStatus: "PREPARING_REQUEST",
       url: null,
-      folderFile: "/data/netcdf",
+      page:1,
+      itemsPages:[],
+      folderFile: "/thumnails/RGB",
+      items: [
+         
+      ],
+      listCount: 0,
+      pageSize: 6,
     };
   },
 
@@ -204,16 +208,21 @@ export default {
     },
 
     downloadAllowed() {
-      if (this.years && this.years.length > 0) {
+      if (this.years && this.years.length > 0 || this.items) {
         return false;
       }
       return true;
     },
+    pages() {
+			let _this = this;
+			if (_this.pageSize == null || _this.listCount == null) return 0;
+			return Math.ceil(_this.listCount / _this.pageSize);
+		}
   },
 
   watch: {
     metadata() {
-      this.loadYears();
+      this.loadImage();
     },
     language(value) {
       this.$i18n.locale = value;
@@ -222,23 +231,32 @@ export default {
 
   created() {
     this.$i18n.locale = this.language;
-    //this.loadYears()
+    //this.loadImage()
     this.file();
+    this.initPage();
+		this.updatePage(this.page);
   },
 
   methods: {
     file() {
-      this.loadYears(this.folderFile);
+      this.loadImage(this.folderFile);
     },
 
-    loadParamsName(short_name) {
-      for (let i = 0; i < this.metadata.parameterSet.length; i++) {
-        if (this.metadata.parameterSet[i].shortName == short_name) {
-          return this.metadata.parameterSet[i].longName;
-        }
-      }
-      return "";
-    },
+    initPage() {
+			this.listCount = this.items.length;
+			if (this.listCount < this.pageSize) {
+				this.itemsPages = this.items;
+			} else {
+				this.itemsPages = this.items.slice(0, this.pageSize);
+			}
+		},
+    updatePage(pageIndex) {
+			let _this = this;
+			let _start = (pageIndex - 1) * _this.pageSize;
+			let _end = pageIndex * _this.pageSize;
+			_this.itemsPages = _this.items.slice(_start, _end);
+			_this.page = pageIndex;
+		},
 
     download(url) {
       this.currentStatus = "PREPARING_REQUEST";
@@ -289,8 +307,7 @@ export default {
           this.selectedParams.join("___")
       );
     },
-
-    loadYears(index) {
+    loadImage(format) {
       let url = null;
       if (
         this.metadata &&
@@ -313,40 +330,36 @@ export default {
       console.log(
         "url ",
         this.url +
-          "data/v1_0/request1?collection=" +
+          "data/v1_0/thumbnails?collection=" +
           this.metadata.id +
           "&folder=" +
-          index
+          format
       );
       this.axios({
         method: "get",
         url:
           this.url +
-          "data/v1_0/request1?collection=" +
+          "data/v1_0/thumbnails?collection=" +
           this.metadata.id +
           "&folder=" +
-          index,
+          format,
         //url: this.url + "/request?collection="+this.metadata.id,
       })
         .then((response) => {
           this.years = [];
-          this.params = [];
-          this.selectedParams = [];
+          this.items = [];
           console.log("Response", response.data);
 
           for (let i = 0; i < response.data.entries.length; i++) {
             this.years.push(response.data.entries[i].date.substring(0, 4));
           }
-          for (let i = 0; i < response.data.pivots.length; i++) {
-            this.selectedParams.push(response.data.pivots[i].name);
+          for (let i = 0; i < response.data.urls.length; i++) {
+            this.items.push(response.data.urls[i].url);
           }
-          for (let i = 0; i < response.data.parameters.length; i++) {
-            if (
-              !this.selectedParams.includes(response.data.parameters[i].name)
-            ) {
-              this.params.push(response.data.parameters[i].name);
-            }
-          }
+          this.page=1;
+          this.initPage();
+          this.updatePage(this.page);
+          
         })
         .catch((error) => {
           // this.displayError("An error has occured:" + error)
@@ -359,3 +372,4 @@ export default {
   },
 };
 </script>
+0
