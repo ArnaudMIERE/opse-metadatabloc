@@ -1,7 +1,7 @@
 <i18n  >
 {
   "en": {
-    "opseAccessData": "Data vizualisation",
+    "opseAccessData": "Data visualization",
     "opseDownload": "Download",
     "explicationText": "Select the years you want to download (all years are selected by default).",
     "explicationTextParams": "Select the params you want to download (all params are selected by default).",
@@ -56,21 +56,11 @@
       <div>
         <v-row height="900px">
           <v-col v-for="(item, index) in itemsPages" :key="index" class="d-flex child-flex" cols="3">
-            <v-img
+            <img
               :src=item
-              :lazy-src=item
-              aspect-ratio="1"
-              class="grey lighten-2"
-            >
-              <template v-slot:placeholder>
-                <v-row class="fill-height ma-0" align="center" justify="center">
-                  <v-progress-circular
-                    indeterminate
-                    color="grey lighten-5"
-                  ></v-progress-circular>
-                </v-row>
-              </template>
-            </v-img>
+              max-height="500"
+              max-width="500"
+              />
           </v-col>
         </v-row>
         
@@ -146,7 +136,6 @@ export default {
 
   data() {
     return {
-      prefix: "file:///",
       dataPolicy: false,
       years: [],
       params: [],
@@ -157,11 +146,9 @@ export default {
       page:1,
       itemsPages:[],
       folderFile: "/thumnails/RGB",
-      items: [
-         
-      ],
+      items: [],
       listCount: 0,
-      pageSize: 6,
+      pageSize: 12,
     };
   },
 
@@ -192,6 +179,7 @@ export default {
     applyTheme() {
       return applyPrimaryAndSecondaryColors(this.theme);
     },
+    
 
     isVisible() {
       let isVisible = false;
@@ -307,6 +295,7 @@ export default {
           this.selectedParams.join("___")
       );
     },
+    
     loadImage(format) {
       let url = null;
       if (
@@ -353,8 +342,12 @@ export default {
           for (let i = 0; i < response.data.entries.length; i++) {
             this.years.push(response.data.entries[i].date.substring(0, 4));
           }
-          for (let i = 0; i < response.data.urls.length; i++) {
-            this.items.push(response.data.urls[i].url);
+          for (let i = 0;  i < response.data.urls.length; i++) {
+            //let base64String = Buffer.from(String.fromCharCode.apply(null, new Uint8Array(response.data.urls[i].image)), 'utf8').toString('base64');
+            //this.items.push("data:image/jpg;base64," + base64String);
+
+            this.items.push("data:image/jpg;base64,"+response.data.urls[i].image);
+            //this.items.push(URL.createObjectURL(response.data.urls[i].image));
           }
           this.page=1;
           this.initPage();
