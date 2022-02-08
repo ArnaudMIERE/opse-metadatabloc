@@ -232,7 +232,6 @@ export default {
     },
 
     loadParamsName(short_name) {
-
       for (let i = 0; i < this.metadata.parameterSet.length; i++) {
         if (this.metadata.parameterSet[i].shortName == short_name) {
           return this.metadata.parameterSet[i].longName;
