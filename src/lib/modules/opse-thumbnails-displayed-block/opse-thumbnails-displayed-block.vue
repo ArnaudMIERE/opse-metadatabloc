@@ -56,11 +56,46 @@
       <div>
         <v-row height="900px">
           <v-col v-for="(item, index) in itemsPages" :key="index" class="d-flex child-flex" cols="3">
-            <img
-              :src=item
-              max-height="500"
-              max-width="500"
-              />
+            <v-dialog
+          transition="dialog-bottom-transition"
+          max-width="700"
+        >
+          
+          <template v-slot:activator="{ on, attrs }">
+            <v-card>
+              <v-img
+                color="primary"
+                v-bind="attrs"
+                v-on="on"
+                :src=item
+                height="270"
+                width="270"
+              ></v-img>
+              <v-card-title class="text-h6">
+                {{itemsNamePages[index]}}
+              </v-card-title>
+            </v-card>
+          </template>
+        
+          <template v-slot:default="dialog">
+            <v-card>
+              <v-img
+              :src = itemsPages[index]
+              color="primary"
+              v-bind="attrs"
+              v-on="on"
+            ></v-img>
+              <v-card-actions class="justify-end">
+                <v-btn
+                  text
+                  @click="dialog.value = false"
+                >Close</v-btn>
+              </v-card-actions>
+            </v-card>
+          </template>
+          
+        </v-dialog>
+            
           </v-col>
         </v-row>
         
@@ -145,8 +180,10 @@ export default {
       url: null,
       page:1,
       itemsPages:[],
+      itemsNamePages:[],
       folderFile: "/thumnails/RGB",
       items: [],
+      itemsName: [],
       listCount: 0,
       pageSize: 12,
     };
@@ -234,8 +271,10 @@ export default {
 			this.listCount = this.items.length;
 			if (this.listCount < this.pageSize) {
 				this.itemsPages = this.items;
+        this.itemsNamePages = this.itemsName;
 			} else {
 				this.itemsPages = this.items.slice(0, this.pageSize);
+        this.itemsNamePages = this.itemsName.slice(0, this.pageSize);
 			}
 		},
     updatePage(pageIndex) {
@@ -243,6 +282,7 @@ export default {
 			let _start = (pageIndex - 1) * _this.pageSize;
 			let _end = pageIndex * _this.pageSize;
 			_this.itemsPages = _this.items.slice(_start, _end);
+      _this.itemsNamePages = _this.itemsName.slice(_start, _end);
 			_this.page = pageIndex;
 		},
 
@@ -337,6 +377,7 @@ export default {
         .then((response) => {
           this.years = [];
           this.items = [];
+          this.itemsName = [];
           console.log("Response", response.data);
 
           for (let i = 0; i < response.data.entries.length; i++) {
@@ -345,7 +386,7 @@ export default {
           for (let i = 0;  i < response.data.urls.length; i++) {
             //let base64String = Buffer.from(String.fromCharCode.apply(null, new Uint8Array(response.data.urls[i].image)), 'utf8').toString('base64');
             //this.items.push("data:image/jpg;base64," + base64String);
-
+            this.itemsName.push(response.data.urls[i].name.split('.')[0])
             this.items.push("data:image/jpg;base64,"+response.data.urls[i].image);
             //this.items.push(URL.createObjectURL(response.data.urls[i].image));
           }
