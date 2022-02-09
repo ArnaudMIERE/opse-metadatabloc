@@ -39,17 +39,17 @@
       <v-radio-group v-model="folderFile" column>
         <v-radio
           label="RGB"
-          value="/thumnails/RGB"
+          value="/thumnails/tiff/RGB"
           @click="loadImage(folderFile)"
         ></v-radio>
         <v-radio
           label="MS"
-          value="/thumnails/MS"
+          value="/thumnails/tiff/MS"
           @click="loadImage(folderFile)"
         ></v-radio>
         <v-radio
           label="MNE"
-          value="/thumnails/MNE"
+          value="/thumnails/tiff/MNE"
           @click="loadImage(folderFile)"
         ></v-radio>
       </v-radio-group>
@@ -181,7 +181,7 @@ export default {
       page:1,
       itemsPages:[],
       itemsNamePages:[],
-      folderFile: "/thumnails/RGB",
+      folderFile: "/thumnails/tiff/RGB",
       items: [],
       itemsName: [],
       listCount: 0,
