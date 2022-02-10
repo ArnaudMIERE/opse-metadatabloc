@@ -191,7 +191,7 @@ export default {
       items: [],
       itemsName: [],
       listCount: 0,
-      pageSize: 12,
+      pageSize: 4,
     };
   },
 
