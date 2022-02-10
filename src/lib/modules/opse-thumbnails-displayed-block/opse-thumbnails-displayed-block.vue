@@ -39,30 +39,35 @@
       <v-radio-group v-model="folderFile" column>
         <v-radio
           label="RGB"
-          value="/thumnails/tiff/RGB"
+          value="/thumbnails/tiff/RGB"
           @click="loadImage(folderFile)"
         ></v-radio>
         <v-radio
           label="MS"
-          value="/thumnails/tiff/MS"
+          value="/thumbnails/tiff/MS"
           @click="loadImage(folderFile)"
         ></v-radio>
         <v-radio
           label="MNE"
-          value="/thumnails/tiff/MNE"
+          value="/thumbnails/tiff/MNE"
           @click="loadImage(folderFile)"
         ></v-radio>
       </v-radio-group>
       <div>
         <v-row height="900px">
-          <v-col v-for="(item, index) in itemsPages" :key="index" class="d-flex child-flex" cols="3">
+          <v-col v-for="(item, index) in itemsPages" :key="index" class="d-flex child-flex" cols="6">
             <v-dialog
           transition="dialog-bottom-transition"
           max-width="700"
         >
           
           <template v-slot:activator="{ on, attrs }">
-            <v-card>
+            <v-card
+            class="mx-auto my-12"
+            max-width="374"
+            >
+            <center>
+
               <v-img
                 color="primary"
                 v-bind="attrs"
@@ -74,6 +79,7 @@
               <v-card-title class="text-h6">
                 {{itemsNamePages[index]}}
               </v-card-title>
+            </center>
             </v-card>
           </template>
         
@@ -181,7 +187,7 @@ export default {
       page:1,
       itemsPages:[],
       itemsNamePages:[],
-      folderFile: "/thumnails/tiff/RGB",
+      folderFile: "/thumbnails/tiff/RGB",
       items: [],
       itemsName: [],
       listCount: 0,
