@@ -6,6 +6,7 @@ import opseDatasetNameBlockTest from "@/demo/modules/opse-datasetname-block-test
 import opseDownloadBlockTest from "@/demo/modules/opse-download-block-test/opse-download-block-test.vue";
 import opseYearBasedDownloadBlockTest from "@/demo/modules/opse-year-based-download-block-test/opse-year-based-download-block-test.vue";
 import opseDataNetcdfBlockTest from "@/demo/modules/opse-data-netcdf-block-test/opse-data-netcdf-block-test.vue";
+import opseImagesDisplayedBlockTest from "@/demo/modules/opse-images-displayed-block-test/opse-images-displayed-block-test.vue";
 
 import opseThumbnailsDisplayedBlockTest from "@/demo/modules/opse-thumbnails-displayed-block-test/opse-thumbnails-displayed-block-test.vue";
 Vue.use(VueRouter)
@@ -36,6 +37,11 @@ const routes = [
 {
     path:"/opse-thumbnails-displayed-block",
     component: opseThumbnailsDisplayedBlockTest,
+},
+
+{
+    path:"/opse-images-displayed-block",
+    component: opseImagesDisplayedBlockTest,
 }
 ];
 
