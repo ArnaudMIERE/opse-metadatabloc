@@ -34,16 +34,17 @@
   <div>
     <v-card v-if="isVisible" :style="applyTheme" :flat="true">
       <v-card-title>
-        <!-- <v-icon large left style="color: #f39c12">mdi-database</v-icon> -->
+        <v-icon large left style="color: #f39c12">mdi-image-outline</v-icon>
         <span>{{ $t("opseDisplayedImg") }}</span>
       </v-card-title>
 
       <article>
         <v-card
-        class="mx-auto my-auto"
-            max-width="500"
+        class="mx-auto my-auto mt-3"
+            max-width="500" 
+            outlined
         >
-          <v-subheader>Tick labels</v-subheader>
+          <!--v-subheader>Tick labels</v-subheader-->
 
           <v-card-text>
             <v-slider
@@ -118,7 +119,7 @@ export default {
 
       this.$emit("getVisibility", {
         name: this.$options.name,
-        programmaticScrollingTitle: this.$t("opseDownload"),
+        programmaticScrollingTitle: this.$t("opseDisplayedImg"),
         isVisible,
       });
       return isVisible;
@@ -201,3 +202,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.theme--light.v-sheet--outlined {
+    border: none;
+}
+</style>
