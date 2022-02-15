@@ -55,60 +55,62 @@
       </v-radio-group>
       <div>
         <v-row height="900px">
-          <v-col v-for="(item, index) in itemsPages" :key="index" class="d-flex child-flex" cols="6">
-            <v-dialog
-          transition="dialog-bottom-transition"
-          max-width="700"
-        >
-          
-          <template v-slot:activator="{ on, attrs }">
-            <v-card
-            class="mx-auto my-auto"
-            max-width="374"
-            >
-            <center>
+          <v-col
+            v-for="(item, index) in itemsPages"
+            :key="index"
+            class="d-flex child-flex"
+            cols="6"
+          >
+            <v-dialog transition="dialog-bottom-transition" max-width="700">
+              <template v-slot:activator="{ on, attrs }">
+                <v-card class="mx-auto my-auto" max-width="374">
+                  <center>
+                    <v-img
+                      color="primary"
+                      v-bind="attrs"
+                      v-on="on"
+                      :src="item"
+                      height="270"
+                      width="270"
+                    ></v-img>
+                    <v-card-title class="justify-center">
+                      {{ itemsNamePages[index] }}
+                      <v-btn class="ma-2" color="indigo" dark @click="downloadImage(urls[index])">
+                        <v-icon dark> mdi-cloud-download </v-icon>
+                      </v-btn>
+                    </v-card-title>
+                  </center>
+                </v-card>
+              </template>
 
-              <v-img
-                color="primary"
-                v-bind="attrs"
-                v-on="on"
-                :src=item
-                height="270"
-                width="270"
-              ></v-img>
-              <v-card-title class="text-h6">
-                {{itemsNamePages[index]}}
-              </v-card-title>
-            </center>
-            </v-card>
-          </template>
-        
-          <template v-slot:default="dialog">
-            <v-card>
-              <v-img
-              :src = itemsPages[index]
-              color="primary"
-              v-bind="attrs"
-              v-on="on"
-            ></v-img>
-              <v-card-actions class="justify-end">
-                <v-btn
-                  text
-                  @click="dialog.value = false"
-                >Close</v-btn>
-              </v-card-actions>
-            </v-card>
-          </template>
-          
-        </v-dialog>
-            
+              <template v-slot:default="dialog">
+                <v-card>
+                  <v-img
+                    :src="itemsPages[index]"
+                    color="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-img>
+                  <v-card-actions class="justify-end">
+                    <v-btn class="ma-2" color="indigo" dark @click="downloadImage(urls[index])">
+                      <v-icon dark> mdi-cloud-download </v-icon>
+                    </v-btn>
+                    <v-btn text @click="dialog.value = false">Close</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </v-dialog>
           </v-col>
         </v-row>
-        
       </div>
       <div class="text-center">
-          <v-pagination class="pagination mb-2" v-model="page" :length="pages" @input="updatePage"></v-pagination>
-        </div>
+        <v-pagination
+          class="pagination mb-2"
+          v-model="page"
+          :length="pages"
+          @input="updatePage"
+        ></v-pagination>
+      </div>
 
       <p>To download the data files, you should agree with the Data Policy.</p>
       <!--p v-if="downloadAllowed"> No data availaible</p-->
@@ -184,9 +186,10 @@ export default {
       selectedParams: [],
       currentStatus: "PREPARING_REQUEST",
       url: null,
-      page:1,
-      itemsPages:[],
-      itemsNamePages:[],
+      urls: [],
+      page: 1,
+      itemsPages: [],
+      itemsNamePages: [],
       folderFile: "/thumbnails/tiff/RGB",
       items: [],
       itemsName: [],
@@ -222,7 +225,6 @@ export default {
     applyTheme() {
       return applyPrimaryAndSecondaryColors(this.theme);
     },
-    
 
     isVisible() {
       let isVisible = false;
@@ -239,16 +241,16 @@ export default {
     },
 
     downloadAllowed() {
-      if (this.years && this.years.length > 0 || this.items) {
+      if ((this.years && this.years.length > 0) || this.items) {
         return false;
       }
       return true;
     },
     pages() {
-			let _this = this;
-			if (_this.pageSize == null || _this.listCount == null) return 0;
-			return Math.ceil(_this.listCount / _this.pageSize);
-		}
+      let _this = this;
+      if (_this.pageSize == null || _this.listCount == null) return 0;
+      return Math.ceil(_this.listCount / _this.pageSize);
+    },
   },
 
   watch: {
@@ -265,7 +267,7 @@ export default {
     //this.loadImage()
     this.file();
     this.initPage();
-		this.updatePage(this.page);
+    this.updatePage(this.page);
   },
 
   methods: {
@@ -274,23 +276,23 @@ export default {
     },
 
     initPage() {
-			this.listCount = this.items.length;
-			if (this.listCount < this.pageSize) {
-				this.itemsPages = this.items;
+      this.listCount = this.items.length;
+      if (this.listCount < this.pageSize) {
+        this.itemsPages = this.items;
         this.itemsNamePages = this.itemsName;
-			} else {
-				this.itemsPages = this.items.slice(0, this.pageSize);
+      } else {
+        this.itemsPages = this.items.slice(0, this.pageSize);
         this.itemsNamePages = this.itemsName.slice(0, this.pageSize);
-			}
-		},
+      }
+    },
     updatePage(pageIndex) {
-			let _this = this;
-			let _start = (pageIndex - 1) * _this.pageSize;
-			let _end = pageIndex * _this.pageSize;
-			_this.itemsPages = _this.items.slice(_start, _end);
+      let _this = this;
+      let _start = (pageIndex - 1) * _this.pageSize;
+      let _end = pageIndex * _this.pageSize;
+      _this.itemsPages = _this.items.slice(_start, _end);
       _this.itemsNamePages = _this.itemsName.slice(_start, _end);
-			_this.page = pageIndex;
-		},
+      _this.page = pageIndex;
+    },
 
     download(url) {
       this.currentStatus = "PREPARING_REQUEST";
@@ -327,6 +329,16 @@ export default {
           index
       );
     },
+    downloadImage(index) {
+      //this.download(this.url+"download?collectionId="+this.metadata.id)
+      window.open(
+        this.url +
+          "data/v1_0/downloadImg?collectionId=" +
+          this.metadata.id +
+          "&image=" +
+          index
+      );
+    },
 
     downloadSelected(index) {
       window.open(
@@ -341,7 +353,7 @@ export default {
           this.selectedParams.join("___")
       );
     },
-    
+
     loadImage(format) {
       let url = null;
       if (
@@ -384,22 +396,24 @@ export default {
           this.years = [];
           this.items = [];
           this.itemsName = [];
+          this.urls = []
           console.log("Response", response.data);
 
           for (let i = 0; i < response.data.entries.length; i++) {
             this.years.push(response.data.entries[i].date.substring(0, 4));
           }
-          for (let i = 0;  i < response.data.urls.length; i++) {
+          for (let i = 0; i < response.data.urls.length; i++) {
             //let base64String = Buffer.from(String.fromCharCode.apply(null, new Uint8Array(response.data.urls[i].image)), 'utf8').toString('base64');
             //this.items.push("data:image/jpg;base64," + base64String);
-            this.itemsName.push(response.data.urls[i].name.split('.')[0])
-            this.items.push("data:image/jpg;base64,"+response.data.urls[i].image);
-            //this.items.push(URL.createObjectURL(response.data.urls[i].image));
+            this.itemsName.push(response.data.urls[i].name.split(".")[0]);
+            this.items.push(
+              "data:image/jpg;base64," + response.data.urls[i].image
+            );
+            this.urls.push(response.data.urls[i].url);
           }
-          this.page=1;
+          this.page = 1;
           this.initPage();
           this.updatePage(this.page);
-          
         })
         .catch((error) => {
           // this.displayError("An error has occured:" + error)
