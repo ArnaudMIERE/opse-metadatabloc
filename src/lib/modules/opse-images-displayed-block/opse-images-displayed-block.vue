@@ -77,18 +77,8 @@ export default {
       dataPolicy: false,
       currentStatus: "PREPARING_REQUEST",
       image: 0,
-      years: [
-        '2018',
-        '2019',
-        '2020',
-        '2021',
-        '2022',
-      ],
-      images:['https://d1fq16qvu9tpz9.cloudfront.net/uploads/ckeditor/pictures/110/content_Screen_Shot_2017-08-10_at_2.53.54_PM.png',
-             'https://lh3.googleusercontent.com/-sCfzC3XvMJ4nzaGWB0Tt455uhaAn7usvQPrs0GkTf2RGjKpKY3rjeXMi8okbCI-yRE=w454-rwa',
-             'https://upload.wikimedia.org/wikipedia/commons/4/43/Grafic_contributii_2008.png',
-             'https://upload.wikimedia.org/wikipedia/commons/4/43/Grafic_contributii_2008.png',
-             'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-6t06HlYgd59JJbdXnP8NWtdtkk835RPdXTeXLLDwp8V0mlDX5IjD1M_TYS2VnquG0_0&usqp=CAU']
+      years: [],
+      images:[]
     };
   },
 
