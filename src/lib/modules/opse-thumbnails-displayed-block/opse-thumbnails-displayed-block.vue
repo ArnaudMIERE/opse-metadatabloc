@@ -75,7 +75,7 @@
                     ></v-img>
                     <v-card-title class="justify-center">
                       {{ itemsNamePages[index] }}
-                      <v-btn class="ma-2" color="indigo" dark @click="downloadImage(urls[index])">
+                      <v-btn class="ma-2" color="indigo" dark small @click="downloadImage(urls[index])">
                         <v-icon dark> mdi-cloud-download </v-icon>
                       </v-btn>
                     </v-card-title>
@@ -92,7 +92,7 @@
                     v-on="on"
                   ></v-img>
                   <v-card-actions class="justify-end">
-                    <v-btn class="ma-2" color="indigo" dark @click="downloadImage(urls[index])">
+                    <v-btn class="ma-2" color="indigo" dark small @click="downloadImage(urls[index])">
                       <v-icon dark> mdi-cloud-download </v-icon>
                     </v-btn>
                     <v-btn text @click="dialog.value = false">Close</v-btn>
@@ -426,4 +426,11 @@ export default {
   },
 };
 </script>
-0
+<style scoped>
+ul.v-pagination>li:last-child{
+  margin-bottom: 10px;
+};
+.wrapper-content ul li:last-child, .wrapper-layout ul li:last-child {
+    margin-bottom: 0px;
+}
+</style>
