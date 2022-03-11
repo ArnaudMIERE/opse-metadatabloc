@@ -11,6 +11,7 @@
       <v-chip class="mx-2"><router-link to="/opse-data-netcdf-block">/opse-data-netcdf-block</router-link></v-chip>
       <v-chip class="mx-2"><router-link to="/opse-thumbnails-displayed-block">/opse-thumbnails-displayed-block</router-link></v-chip> 
       <v-chip class="mx-2"><router-link to="/opse-images-displayed-block">/opse-images-displayed-block</router-link></v-chip> 
+      <v-chip class="mx-2"><router-link to="/opse-visualisation-block">/opse-visualisation-block</router-link></v-chip> 
 
     </div>
     <router-view></router-view>
