@@ -10,6 +10,7 @@ import opseImagesDisplayedBlockTest from "@/demo/modules/opse-images-displayed-b
 
 import opseThumbnailsDisplayedBlockTest from "@/demo/modules/opse-thumbnails-displayed-block-test/opse-thumbnails-displayed-block-test.vue";
 import opseVisualisationBlockTest from "@/demo/modules/opse-visualisation-block-test/opse-visualisation-block-test.vue";
+import opseGaleryImagesDisplayedBlock from "@/demo/modules/opse-galery-images-displayed-block-test/opse-galery-images-displayed-block-test.vue";
 
 Vue.use(VueRouter)
 
@@ -17,6 +18,10 @@ const routes = [
 {
     path: "/myproject-fake-block",
     component: myProjectFakeBlockTest,
+},
+{
+    path: "/opse-galery-images-displayed-block",
+    component: opseGaleryImagesDisplayedBlock,
 },
 {
     path: "/opse-datasetname-block",
