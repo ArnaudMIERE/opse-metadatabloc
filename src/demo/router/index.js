@@ -9,6 +9,9 @@ import opseDataNetcdfBlockTest from "@/demo/modules/opse-data-netcdf-block-test/
 import opseImagesDisplayedBlockTest from "@/demo/modules/opse-images-displayed-block-test/opse-images-displayed-block-test.vue";
 
 import opseThumbnailsDisplayedBlockTest from "@/demo/modules/opse-thumbnails-displayed-block-test/opse-thumbnails-displayed-block-test.vue";
+import opseVisualisationBlockTest from "@/demo/modules/opse-visualisation-block-test/opse-visualisation-block-test.vue";
+import opseGaleryImagesDisplayedBlock from "@/demo/modules/opse-galery-images-displayed-block-test/opse-galery-images-displayed-block-test.vue";
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -17,8 +20,16 @@ const routes = [
     component: myProjectFakeBlockTest,
 },
 {
+    path: "/opse-galery-images-displayed-block",
+    component: opseGaleryImagesDisplayedBlock,
+},
+{
     path: "/opse-datasetname-block",
     component: opseDatasetNameBlockTest,
+},
+{
+    path: "/opse-visualisation-block",
+    component: opseVisualisationBlockTest,
 },
 {
     path:"/opse-download-block",

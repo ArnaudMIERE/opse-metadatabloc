@@ -1,0 +1,361 @@
+<i18n  >
+{
+  "en": {
+    "opseAccessData": "Data visualization",
+    "opseDownload": "Download",
+    "explicationText": "Select the years you want to download (all years are selected by default).",
+    "explicationTextParams": "Select the params you want to download (all params are selected by default).",
+    "year": "Year",
+    "param": "Parameter",
+    "downloadAll": "Download All years",
+    "downloadSelected": "Download selected years",
+    "opseAlert":"No data available yet."        
+
+  },
+  "fr": {
+    "opseAccessData": "Visualisation des données",
+    "opseDownload": "Téléchargement",
+    "explicationText": "Selectionnez les années que vous voulez télécharger (toutes les années sont sélectionées par défaut).",
+    "explicationTextParams": "Selectionnez les paramètres que vous voulez télécharger (tous les paramètres sont sélectionés par défaut).",
+    "year": "Année",
+    "param": "Parametre",
+    "downloadAll": "Télécharger",
+    "downloadSelected": "Télécharger la sélection",
+    "opseAlert":"Aucune donnée n'est encore disponible."
+    
+
+  }
+}
+</i18n>
+
+<template>
+  <div>
+    <v-card v-if="isVisible" :style="applyTheme" :flat="true">
+      <v-card-title>
+        <v-icon large left style="color: #f39c12">mdi-database</v-icon>
+        <span>{{ $t("opseAccessData") }}</span>
+      </v-card-title>
+      <div>
+        <v-row height="900px">
+          <v-col
+            v-for="(item, index) in itemsPages"
+            :key="index"
+            class="d-flex child-flex"
+            cols="4"
+          >
+            <v-dialog transition="dialog-bottom-transition" width="700">
+              <template v-slot:activator="{ on, attrs }">
+                <v-card class="mx-auto my-auto" max-width="270">
+                  <center>
+                    <v-img
+                      color="primary"
+                      v-bind="attrs"
+                      v-on="on"
+                      :src="item"
+                      height="270"
+                      width="270"
+                    ></v-img>
+                    <v-card-title class="justify-center">
+                      {{ itemsNamePages[index] }}
+                      <v-btn class="ma-2" color="indigo" dark @click="downloadImage(urls[index])">
+                        <v-icon dark> mdi-cloud-download </v-icon>
+                      </v-btn>
+                    </v-card-title>
+                  </center>
+                </v-card>
+              </template>
+
+              <template v-slot:default="dialog">
+                <v-card>
+                  <v-img
+                    :src="itemsPages[index]"
+                    color="primary"
+                    v-bind="attrs"
+                    v-on="on"
+                  ></v-img>
+                  <v-card-actions class="justify-end">
+                    <v-btn class="ma-2" color="indigo" dark @click="downloadImage(urls[index])">
+                      <v-icon dark> mdi-cloud-download </v-icon>
+                    </v-btn>
+                    <v-btn text @click="dialog.value = false">Close</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </v-dialog>
+          </v-col>
+        </v-row>
+      </div>
+      <div class="text-center">
+        <v-pagination
+          class="pagination mb-2"
+          v-model="page"
+          :length="pages"
+          @input="updatePage"
+        ></v-pagination>
+      </div>
+
+      <p>To download the data files, you should agree with the Data Policy.</p>
+      <!--p v-if="downloadAllowed"> No data availaible</p-->
+      <v-alert v-if="downloadAllowed" dense outlined type="error">{{
+        $t("opseAlert")
+      }}</v-alert>
+      <p>
+        <v-checkbox
+          v-model="dataPolicy"
+          label="I agree with the Data Policy"
+          hide-details
+          :disabled="downloadAllowed"
+        ></v-checkbox>
+      </p>
+
+      <v-btn
+        color="warning"
+        class="ma-4"
+        @click="downloadAll(folderFile)"
+        :disabled="!url || downloadAllowed || !dataPolicy"
+        >{{ $t("downloadAll") }}</v-btn
+      >
+    </v-card>
+  </div>
+</template>
+
+<script>
+import { applyPrimaryAndSecondaryColors } from "../../utils";
+export default {
+  name: "opse-galery-images-displayed-block",
+
+  data() {
+    return {
+      dataPolicy: false,
+      years: [],
+      params: [],
+      currentStatus: "PREPARING_REQUEST",
+      url: null,
+      folderFile : "/data/jpeg",
+      urls: [],
+      page: 1,
+      itemsPages: [],
+      itemsNamePages: [],
+      items: [],
+      itemsName: [],
+      listCount: 0,
+      pageSize: 9,
+    };
+  },
+
+  props: {
+    language: {
+      type: String,
+      default: "en",
+    },
+    theme: {
+      type: Object,
+      default: () => {
+        return {
+          primaryColor: "#F39C12",
+          secondaryColor: "#AAA",
+        };
+      },
+    },
+
+    metadata: {
+      type: Object,
+      default: () => {
+        return {};
+      },
+    },
+  },
+
+  computed: {
+    applyTheme() {
+      return applyPrimaryAndSecondaryColors(this.theme);
+    },
+
+    isVisible() {
+      let isVisible = false;
+      if (this.url != null) {
+        isVisible = true;
+      }
+
+      this.$emit("getVisibility", {
+        name: this.$options.name,
+        programmaticScrollingTitle: this.$t("opseDownload"),
+        isVisible,
+      });
+      return isVisible;
+    },
+
+    downloadAllowed() {
+      if (this.items) {
+        return false;
+      }
+      return true;
+    },
+    pages() {
+      let _this = this;
+      if (_this.pageSize == null || _this.listCount == null) return 0;
+      return Math.ceil(_this.listCount / _this.pageSize);
+    },
+  },
+
+  watch: {
+    metadata() {
+      this.loadImage();
+    },
+    language(value) {
+      this.$i18n.locale = value;
+    },
+  },
+
+  created() {
+    this.$i18n.locale = this.language;
+    //this.loadImage()
+    this.file();
+    this.initPage();
+    this.updatePage(this.page);
+  },
+
+  methods: {
+    file() {
+      this.loadImage(this.folderFile);
+    },
+
+    initPage() {
+      this.listCount = this.items.length;
+      if (this.listCount < this.pageSize) {
+        this.itemsPages = this.items;
+        this.itemsNamePages = this.itemsName;
+      } else {
+        this.itemsPages = this.items.slice(0, this.pageSize);
+        this.itemsNamePages = this.itemsName.slice(0, this.pageSize);
+      }
+    },
+    updatePage(pageIndex) {
+      let _this = this;
+      let _start = (pageIndex - 1) * _this.pageSize;
+      let _end = pageIndex * _this.pageSize;
+      _this.itemsPages = _this.items.slice(_start, _end);
+      _this.itemsNamePages = _this.itemsName.slice(_start, _end);
+      _this.page = pageIndex;
+    },
+
+    download(url) {
+      this.currentStatus = "PREPARING_REQUEST";
+      let self = this;
+      this.downloadDialog = true;
+      this.axios({
+        method: "get",
+        url: url,
+      })
+        .then((response) => {
+          self.requestId = response.data;
+          /*self.checker = setInterval(() => {
+            self.checkDownload(self.metadata.id,self.requestId);
+           }, 5000);*/
+        })
+        .catch((error) => {
+          // debugger
+          //self.clearChecker();
+          self.displayError("An error has occured:" + error);
+          console.log(error);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+
+    downloadAll(index) {
+      //this.download(this.url+"download?collectionId="+this.metadata.id)
+      window.open(
+        this.url +
+          "data/v1_0/download?collectionId=" +
+          this.metadata.id +
+          "&folder=" +
+          index
+      );
+    },
+    downloadImage(index) {
+      //this.download(this.url+"download?collectionId="+this.metadata.id)
+      window.open(
+        this.url +
+          "data/v1_0/downloadImg?collectionId=" +
+          this.metadata.id +
+          "&image=" +
+          index
+      );
+    },
+
+    loadImage() {
+      let format = this.folderFile
+      let url = null;
+      if (
+        this.metadata &&
+        this.metadata.links &&
+        this.metadata.links.length > 0
+      ) {
+        for (let i = 0; i < this.metadata.links.length; i++) {
+          if (this.metadata.links[i].type == "OPENSEARCH_LINK") {
+            url = this.metadata.links[i].url;
+            break;
+          }
+        }
+      }
+      this.url = url;
+      if (url == null) {
+        return;
+      }
+
+      this.loading = true;
+      console.log(
+        "url ",
+        this.url +
+          "data/v1_0/thumbnails?collection=" +
+          this.metadata.id +
+          "&folder=" +
+          format
+      );
+      this.axios({
+        method: "get",
+        url:
+          this.url +
+          "data/v1_0/thumbnails?collection=" +
+          this.metadata.id +
+          "&folder=" +
+          format,
+        //url: this.url + "/request?collection="+this.metadata.id,
+      })
+        .then((response) => {
+          this.years = [];
+          this.items = [];
+          this.itemsName = [];
+          this.urls = []
+          console.log("Response", response.data);
+
+          for (let i = 0; i < response.data.entries.length; i++) {
+            this.years.push(response.data.entries[i].date.substring(0, 4));
+          }
+          for (let i = 0; i < response.data.urls.length; i++) {
+            //let base64String = Buffer.from(String.fromCharCode.apply(null, new Uint8Array(response.data.urls[i].image)), 'utf8').toString('base64');
+            //this.items.push("data:image/jpg;base64," + base64String);
+            this.itemsName.push(response.data.urls[i].name.split(".")[0]);
+            this.items.push(
+              "data:image/jpg;base64," + response.data.urls[i].image
+            );
+            this.urls.push(response.data.urls[i].url);
+          }
+          this.page = 1;
+          this.initPage();
+          this.updatePage(this.page);
+        })
+        .catch((error) => {
+          // this.displayError("An error has occured:" + error)
+          console.log(error);
+        })
+        .finally(() => {
+          this.loading = false;
+        });
+    },
+  },
+};
+</script>
+0
