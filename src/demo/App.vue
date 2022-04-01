@@ -13,6 +13,7 @@
       <v-chip class="mx-2"><router-link to="/opse-images-displayed-block">/opse-images-displayed-block</router-link></v-chip> 
       <v-chip class="mx-2"><router-link to="/opse-visualisation-block">/opse-visualisation-block</router-link></v-chip>
       <v-chip class="mx-2"><router-link to="/opse-galery-images-displayed-block">/opse-galery-images-displayed-block</router-link></v-chip> 
+      <v-chip class="mx-2"><router-link to="/openopse-visualisation-block">/openopse-visualisation-block</router-link></v-chip>
 
     </div>
     <router-view></router-view>

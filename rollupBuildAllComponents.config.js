@@ -9,7 +9,9 @@ import { i18n } from "./lib/index.js";
 const postcss = require("rollup-plugin-postcss");
 const ComponentVue = [
     //"./src/lib/modules/myproject-fake-block/myproject-fake-block.vue",
-    "./src/lib/modules/opse-datasetname-block/opse-datasetname-block.vue",
+    //"./src/lib/modules/opse-datasetname-block/opse-datasetname-block.vue",
+    "./src/lib/modules/openopse-visualisation-block/openopse-visualisation-block.vue",
+    
 ];
 
 const confFile = ComponentVue.map(componentpath => {

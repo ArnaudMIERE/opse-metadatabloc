@@ -15,10 +15,13 @@
         "i18n:report": "vue-cli-service i18n:report --src './src/**/*.?(js|vue)' --locales './src/locales/**/*.json'"
     },
     "dependencies": {
+        "@mapbox/geojson-extent": "^1.0.1",
         "axios": "^0.19.2",
         "core-js": "^3.6.4",
         "dotenv": "^8.2.0",
+        "geojson-extent": "^0.3.2",
         "highcharts": "6.1.1",
+        "leaflet": "^1.7.1",
         "lodash": "^4.17.15",
         "marked": "^0.8.0",
         "moment": "^2.24.0",
@@ -30,6 +33,7 @@
         "vue-i18n": "^8.0.0",
         "vue-router": "^3.1.5",
         "vue2-highcharts": "^1.2.5",
+        "vue2-leaflet": "^2.7.1",
         "vuelayers": "^0.11.28",
         "vuetify": "^2.3.4",
         "vuex": "^3.1.2"

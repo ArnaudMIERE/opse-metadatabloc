@@ -11,6 +11,7 @@ import opseImagesDisplayedBlockTest from "@/demo/modules/opse-images-displayed-b
 import opseThumbnailsDisplayedBlockTest from "@/demo/modules/opse-thumbnails-displayed-block-test/opse-thumbnails-displayed-block-test.vue";
 import opseVisualisationBlockTest from "@/demo/modules/opse-visualisation-block-test/opse-visualisation-block-test.vue";
 import opseGaleryImagesDisplayedBlock from "@/demo/modules/opse-galery-images-displayed-block-test/opse-galery-images-displayed-block-test.vue";
+import openopseVisualisationBlockTest  from "@/demo/modules/openopse-visualisation-block-test/openopse-visualisation-block-test.vue";
 
 Vue.use(VueRouter)
 
@@ -53,6 +54,10 @@ const routes = [
 {
     path:"/opse-images-displayed-block",
     component: opseImagesDisplayedBlockTest,
+},
+{
+    path:"/openopse-visualisation-block",
+    component: openopseVisualisationBlockTest,
 }
 ];
 
