@@ -1,29 +1,49 @@
 <i18n  >
 {
   "en": {
-    "msecVisualisation": "Visualisation",
-    "msecOpacity": "Opacity",
-    "instructions": "Hover over the areas to get information about them."
+    "opseVisualisation": "Visualisation",
+    "Informations": "Informations",
+    "Coordinates": "Coordinates",
+    "Properties": "Properties",
+    "instructions": "Select the areas to get information about them."
   },
   "fr": {
-    "msecVisualisation": "Visualisation",
-    "msecOpacity": "Opacité",
-    "instructions": "Survolez les zones afin d'obtenir l'information les concernant."
+    "opseVisualisation": "Visualisation",
+    "Informations": "Informations",
+    "Coordinates": "Coordonnées",
+    "Properties": "Propriétés",
+    "instructions": "Sélectionner les zones afin d'obtenir l'information les concernant."
   }
 }
 </i18n>
-
 <template>
-  <v-card v-if="isVisible" :style="applyTheme" :flat="true">
+    
+
+<v-card v-if="isVisible" :style="applyTheme" :flat="true">
     <v-card-title>
       <v-icon large left>mdi-earth</v-icon>
-      <span>{{ $t('msecVisualisation') }}</span>
+      <span>{{ $t('opseVisualisation') }}</span>
     </v-card-title> 
+
     <p>
-    <span class="text-caption">{{ $t('instructions') }}</span>
+      <span class="text-caption">{{ $t('instructions') }}</span>
     </p>
-    <v-progress-linear indeterminate v-if="loading" class="mt-3"></v-progress-linear>
-    <v-card-text v-else class="mt-5">
+    <v-card>
+  <div v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id">
+    <v-card-title>
+    {{ $t('Informations') }}
+    </v-card-title>
+    <v-card-text>
+      {{ $t('Coordonnées') }}: {{feature.geometry.coordinates}}<br/><br/>
+      {{ $t('Properties') }}: {{feature.properties}}
+      
+    </v-card-text>
+    
+    
+  </div>
+</v-card>
+  <v-progress-linear indeterminate v-if="loading" class="mt-3"></v-progress-linear>
+  <v-card-text v-else class="mt-5">
       <div v-if="yearValue">
       <v-slider
         v-model="yearIndex"
@@ -39,28 +59,32 @@
           </template>
       </v-slider>
       </div>
-      <v-progress-linear indeterminate v-if="loadingFeatures" class="mt-3"></v-progress-linear>
-      <vl-map class="map" ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true"
-        data-projection="EPSG:4326" style="height: 450px" @pointermove="addOverlayOnHoveredFeature">
-        <vl-view :min-zoom="1"></vl-view>
-        <vl-layer-tile id="osm">
-         <vl-source-xyz :url="mapUrl"></vl-source-xyz>
-        </vl-layer-tile>
-        <vl-layer-vector id="features-panel">
-          <vl-source-vector :features.sync="features"></vl-source-vector>
-        </vl-layer-vector>
-        <vl-overlay id="overlay" :position="overlayCoordinate" positioning='bottom-center'>
-          <template>
-            <div class="overlay-content">
-              <span v-if="showOverlay" style="font-weight: bold;">{{ overlayMessage }}</span>
-            </div>
-          </template>
-        </vl-overlay>
-      </vl-map>
-      <v-slider v-model="opacitySlider" min="0" max="10" :label="$t('msecOpacity')" @change="setOpacity()"></v-slider>
-    </v-card-text>
+  <vl-map class="map" ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true"
+        data-projection="EPSG:4326" style="height: 450px" >
+    <vl-view :min-zoom="1"></vl-view>
+    
+    <vl-layer-tile>
+      <vl-source-xyz :url="mapUrl"></vl-source-xyz>
+    </vl-layer-tile>
+    
+    <vl-layer-vector id="features-panel">
+      <vl-source-vector :features.sync="features" ></vl-source-vector>
+    </vl-layer-vector>
+    
+    <vl-interaction-select :features.sync="selectedFeatures"></vl-interaction-select>
+    <!--vl-overlay v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id + '-popup'" :position="findPointOnSurface(feature)" positioning='bottom-center'>
+      <template slot-scope="scope">
+      <div style="background: #fff">
+        Feature {{ feature.id }}<br/>
+        Position {{scope.position}}
+      </div>
+      </template>
+    </vl-overlay-->
+    
+  </vl-map>
+  </v-card-text>  
 
-  </v-card>
+</v-card>
 </template>
 
 
@@ -68,12 +92,13 @@
 import { applyPrimaryAndSecondaryColors } from "../../utils";
 import {transformExtent} from 'ol/proj';
 import {get} from 'ol/proj';
-import {Fill, Stroke, Style} from 'ol/style';
 import geojsonExtent from 'geojson-extent';
 
 
+
+
 export default {
-  name: "openopse-visualisation-block",
+  name: "opse-sig-visualisation-block",
 
   components: {
 
@@ -95,6 +120,12 @@ export default {
         opacitySlider: 5,
         mapLoaded: false,
         mapLoader: 0,
+        zoom: 10,
+      center: [-16.5, 14.5],
+      geojsonUrl: '',
+     
+      selectedFeatures: [],
+
     };
   },
 
@@ -130,7 +161,7 @@ export default {
         }
         this.$emit("getVisibility", {
         name: this.$options.name,
-        programmaticScrollingTitle: this.$t("msecVisualisation"),
+        programmaticScrollingTitle: this.$t("opseVisualisation"),
         isVisible
         });
         return isVisible;
@@ -169,39 +200,30 @@ export default {
     }
   },
 
-  async created() {
+   created() {
     console.log("CREATED")
     //debugger
     this.$i18n.locale = this.language;
-    this.getRangeGeoJson();
-    //this.getFeatures()
+    
+    this.getRangeGeoJson()
 
-    const response = await fetch(this.url + "preview/v1_0/geojson?uuid="+this.metadata.id)
-    this.feature = await response.json();
-    sessionStorage.setItem("feat", JSON.stringify(this.features))
+   
   },
 
   mounted() {
-    console.log("MOUNTED")
-    this.mapLoader = setInterval(() => {
+    
+      this.mapLoader = setInterval(() => {
       this.isMapLoaded();
     }, 1000)
-
-    if (sessionStorage.getItem('feat')){
-      this.features = JSON.parse(sessionStorage.getItem('feat'))
-    }
+    
   },
 
-  updated() {
-    this.styleFeatures()
-  },
+  
 
   methods: {
     /**
      * Get years range form rest api
      */
-    
-
     getRangeGeoJson() {
       this.loading = true
       this.axios({
@@ -219,6 +241,8 @@ export default {
           this.loading = false
       });
     },
+
+    
 
     /**
      * Call Rest Api to get all features for a given year
@@ -238,7 +262,6 @@ export default {
       }).then(response => {
           if(response.data.features) {
             this.features = response.data.features
-            sessionStorage.setItem("feat", JSON.stringify(this.features))
             // start creating global extent from extent of all features
             return this.setExtent()
           } else {
@@ -283,71 +306,6 @@ export default {
       }
     },
 
-    setOpacity() {
-      let vectorLayer = null
-      this.$refs.map.$map.getLayers().forEach(layer => {
-        if (layer.get("id") == "features-panel") {
-        vectorLayer.setOpacity(this.opacity)
-        }
-      });
-    },
-
-    /** 
-     *  Map event @moveend="styleFeatures()
-     *  At the end of the move on the features extent this method is call to style features
-     */
-    styleFeatures() {
-      if(this.$refs.map.$map != null 
-            && this.$refs.map.$map.getLayers() != null) {
-      let vectorLayer = null
-      this.$refs.map.$map.getLayers().forEach(layer => {
-        if (layer.get("id") == "features-panel") {
-          vectorLayer = layer
-        }
-      });
-      if(vectorLayer != null && vectorLayer.getSource() != null) {
-        vectorLayer.setOpacity(this.opacity)
-        let source = vectorLayer.getSource()
-        source.forEachFeature(f => {
-          f.setStyle(new Style({
-            stroke: new Stroke({
-              color: f.getProperties().stroke,
-              width: 1,
-            }),
-            fill: new Fill({
-              color: f.getProperties().fill,
-            }),
-          }))
-        })
-      }
-      }
-    },
-
-    /**
-     * Detected pointed feature and add overlay wit feature name
-     */
-    addOverlayOnHoveredFeature(event) {
-      var currentFeature = null
-      this.$refs.map.$map.forEachFeatureAtPixel(event.pixel, function(f) {
-        currentFeature = f
-      })
-      if (currentFeature) {
-        this.overlayCoordinate = event.coordinate
-        this.showOverlay = true
-        if (!currentFeature.get("LU2")) {
-          this.overlayMessage = currentFeature.get("LU3")
-        }
-        else if(currentFeature.get("LU3") == currentFeature.get("LU2")) {
-           this.overlayMessage = currentFeature.get("LU3")
-        }
-        else {
-          this.overlayMessage = currentFeature.get("LU3") + " - " + currentFeature.get("LU2")
-        }
-      } else {
-        this.showOverlay = false
-      }
-    },
-
     /**
      * Wait for the features layer to be loaded
      */
@@ -376,19 +334,17 @@ export default {
       this.setExtent()
     },
 
-    displayError: function(message) {
-      this.notifierMessage = message;
-      this.notifierColor = "error";
-      this.timeout = 8000;
-      this.notifier = true;
-    },
-
-    displaySuccess: function(message) {
-      this.notifierMessage = message;
-      this.notifierColor = "success";
-      this.timeout = 4000;
-      this.notifier = true;
+    
+  findPointOnSurface(feature) {
+      const point = feature
+      return point.geometry.coordinates
     }
+   
+
+
+    
+
+    
   }
 };
 </script>

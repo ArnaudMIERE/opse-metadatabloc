@@ -9,6 +9,10 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 Vue.use(VueAxios, axios)
 
+import VueLayers from 'vuelayers'
+
+Vue.use(VueLayers)
+
 
 import App from './App.vue';
 import router from '@/demo/router';
