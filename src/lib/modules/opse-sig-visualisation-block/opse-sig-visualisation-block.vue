@@ -338,7 +338,14 @@ export default {
   findPointOnSurface(feature) {
       const point = feature
       return point.geometry.coordinates
-    }
+    },
+
+    displayError: function(message) {
+      this.notifierMessage = message;
+      this.notifierColor = "error";
+      this.timeout = 8000;
+      this.notifier = true;
+    },
    
 
 
