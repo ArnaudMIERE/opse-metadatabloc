@@ -5,14 +5,14 @@
     "Informations": "Informations",
     "Coordinates": "Coordinates",
     "Properties": "Properties",
-    "instructions": "Select the areas to get information about them."
+    "instructions": "Hover over the areas to get information about them."
   },
   "fr": {
     "opseVisualisation": "Visualisation",
     "Informations": "Informations",
     "Coordinates": "Coordonnées",
     "Properties": "Propriétés",
-    "instructions": "Sélectionner les zones afin d'obtenir l'information les concernant."
+    "instructions": "Survolez les zones afin d'obtenir l'information les concernant."
   }
 }
 </i18n>
@@ -28,20 +28,6 @@
     <p>
       <span class="text-caption">{{ $t('instructions') }}</span>
     </p>
-    <v-card>
-  <div v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id">
-    <v-card-title>
-    {{ $t('Informations') }}
-    </v-card-title>
-    <v-card-text>
-      {{ $t('Coordonnées') }}: {{feature.geometry.coordinates}}<br/><br/>
-      {{ $t('Properties') }}: {{feature.properties}}
-      
-    </v-card-text>
-    
-    
-  </div>
-</v-card>
   <v-progress-linear indeterminate v-if="loading" class="mt-3"></v-progress-linear>
   <v-card-text v-else class="mt-5">
       <div v-if="yearValue">
@@ -60,7 +46,7 @@
       </v-slider>
       </div>
   <vl-map class="map" ref="map" :load-tiles-while-animating="true" :load-tiles-while-interacting="true"
-        data-projection="EPSG:4326" style="height: 450px" >
+        data-projection="EPSG:4326" style="height: 450px" @pointermove="addOverlayOnHoveredFeature">
     <vl-view :min-zoom="1"></vl-view>
     
     <vl-layer-tile>
@@ -70,16 +56,16 @@
     <vl-layer-vector id="features-panel">
       <vl-source-vector :features.sync="features" ></vl-source-vector>
     </vl-layer-vector>
+
+    <vl-overlay id="overlay" :position="overlayCoordinate" positioning='bottom-center'>
+          <template>
+            <div class="overlay-content">
+              <span v-if="showOverlay" style="font-weight: bold;">{{ overlayMessage }}</span>
+            </div>
+          </template>
+        </vl-overlay>
     
-    <vl-interaction-select :features.sync="selectedFeatures"></vl-interaction-select>
-    <!--vl-overlay v-for="feature in selectedFeatures" :key="feature.id" :id="feature.id + '-popup'" :position="findPointOnSurface(feature)" positioning='bottom-center'>
-      <template slot-scope="scope">
-      <div style="background: #fff">
-        Feature {{ feature.id }}<br/>
-        Position {{scope.position}}
-      </div>
-      </template>
-    </vl-overlay-->
+    
     
   </vl-map>
   </v-card-text>  
@@ -92,6 +78,7 @@
 import { applyPrimaryAndSecondaryColors } from "../../utils";
 import {transformExtent} from 'ol/proj';
 import {get} from 'ol/proj';
+import {Fill, Stroke, Style, Circle} from 'ol/style';
 import geojsonExtent from 'geojson-extent';
 
 
@@ -201,12 +188,10 @@ export default {
   },
 
    created() {
-    console.log("CREATED")
     //debugger
     this.$i18n.locale = this.language;
     
     this.getRangeGeoJson()
-
    
   },
 
@@ -216,6 +201,10 @@ export default {
       this.isMapLoaded();
     }, 1000)
     
+  },
+
+  updated() {
+    //this.styleFeatures()
   },
 
   
@@ -306,6 +295,30 @@ export default {
       }
     },
 
+
+    /**
+     * Detected pointed feature and add overlay wit feature name
+     */
+    addOverlayOnHoveredFeature(event) {
+      var currentFeature = null
+      this.$refs.map.$map.forEachFeatureAtPixel(event.pixel, function(f) {
+        currentFeature = f
+      })
+      if (currentFeature) {
+        this.overlayCoordinate = event.coordinate
+        this.showOverlay = true
+        this.overlayMessage = currentFeature.get("Species")
+        if (!currentFeature.get("Species")){
+          this.overlayMessage = currentFeature.get("SiteName")+ " - " + currentFeature.get("KeyWords")
+        }else{
+          this.overlayMessage = currentFeature.get("Species")
+        }
+      } else {
+        this.showOverlay = false
+      }
+    },
+
+
     /**
      * Wait for the features layer to be loaded
      */
@@ -347,8 +360,43 @@ export default {
       this.notifier = true;
     },
    
-
-
+styleFeatures() {
+      if(this.$refs.map.$map != null 
+            && this.$refs.map.$map.getLayers() != null) {
+      let vectorLayer = null
+      this.$refs.map.$map.getLayers().forEach(layer => {
+        if (layer.get("id") == "features-panel") {
+          vectorLayer = layer
+        }
+      });
+      if(vectorLayer != null && vectorLayer.getSource() != null) {
+        //vectorLayer.setOpacity(this.opacity)
+        let source = vectorLayer.getSource()
+        source.forEachFeature(f => {
+          f.setStyle(new Style({
+            stroke: new Stroke({
+              color: '#0e97fa',
+              width: 1,
+            }),
+            fill: new Fill({
+              color: 'rgba(0, 153, 255, 0.2)',
+            }),
+            image: new Circle({
+              radius: 4,
+              fill: new Fill({
+              color: [0, 153, 255, 1],
+                          }),
+              stroke: new Stroke({
+              color: [255, 255, 255, 1],
+              width: 5
+    }),
+            }),
+            
+          }))
+        })
+      }
+      }
+    },
     
 
     
