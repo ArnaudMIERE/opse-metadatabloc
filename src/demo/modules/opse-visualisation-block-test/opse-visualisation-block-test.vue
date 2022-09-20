@@ -76,11 +76,11 @@ export default {
         ],
       },
       metadata3: {
-        id: "3d768089-1b12-426e-955f-f276c05f6622",
+        id: "9815b225-e87b-45f5-b478-bec110717a1b",
         links: [
           {
             type: "OPENSEARCH_LINK",
-            url: "http://localhost:8604/",
+            url: "https://services.aeris-data.fr/opseprod/",
             name: "",
             description: { en: "Opensearch data access", fr: "" },
           },

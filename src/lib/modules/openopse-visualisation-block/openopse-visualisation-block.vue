@@ -52,7 +52,7 @@
         <vl-overlay id="overlay" :position="overlayCoordinate" positioning='bottom-center'>
           <template>
             <div class="overlay-content">
-              <span v-if="showOverlay" style="font-weight: bold;">{{ overlayMessage }}</span>
+              <span v-if="showOverlay" style="font-weight: bold;">salut</span>
             </div>
           </template>
         </vl-overlay>

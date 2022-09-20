@@ -112,6 +112,7 @@ export default {
       geojsonUrl: '',
      
       selectedFeatures: [],
+      folderFile : "/data/shp",
 
     };
   },
@@ -200,11 +201,14 @@ export default {
       this.mapLoader = setInterval(() => {
       this.isMapLoaded();
     }, 1000)
-    
+    /* let storedFeatures = localStorage.getItem("features");
+      if (storedFeatures) {
+         this.features = JSON.parse(storedFeatures)
+      }*/
   },
 
   updated() {
-    //this.styleFeatures()
+   // this.styleFeatures()
   },
 
   
@@ -217,7 +221,7 @@ export default {
       this.loading = true
       this.axios({
         method: "get",
-        url: this.url + "preview/v1_0/request?collection="+this.metadata.id,
+        url: this.url + "data/v1_0/request?collection="+this.metadata.id+"&folder="+this.folderFile,
       }).then(response => {
         this.years = []
         for(let i=0 ; i<response.data.entries.length ; i++) {
@@ -238,6 +242,7 @@ export default {
      * Compute global features extent and zoom on it
      */
     getFeatures(index) {
+     
       let link=null
       if (index >= 0){
          link = this.url + "preview/v1_0/geojson?uuid="+this.metadata.id+"&filter="+this.years[index]
@@ -251,6 +256,7 @@ export default {
       }).then(response => {
           if(response.data.features) {
             this.features = response.data.features
+            //localStorage.setItem("features", JSON.stringify(this.features));
             // start creating global extent from extent of all features
             return this.setExtent()
           } else {
@@ -312,6 +318,9 @@ export default {
           this.overlayMessage = currentFeature.get("SiteName")+ " - " + currentFeature.get("KeyWords")
         }else{
           this.overlayMessage = currentFeature.get("Species")
+        }
+        if (currentFeature.get("Type_Sol")){
+          this.overlayMessage = currentFeature.get("Type_Sol")
         }
       } else {
         this.showOverlay = false
@@ -386,10 +395,7 @@ styleFeatures() {
               fill: new Fill({
               color: [0, 153, 255, 1],
                           }),
-              stroke: new Stroke({
-              color: [255, 255, 255, 1],
-              width: 5
-    }),
+              
             }),
             
           }))
@@ -397,7 +403,50 @@ styleFeatures() {
       }
       }
     },
+
+    /*styleFeatures() {
+      if(this.$refs.map.$map != null 
+            && this.$refs.map.$map.getLayers() != null) {
+      let vectorLayer = null
+      this.$refs.map.$map.getLayers().forEach(layer => {
+        if (layer.get("id") == "features-panel") {
+          vectorLayer = layer
+        }
+      });
+      if(vectorLayer != null && vectorLayer.getSource() != null) {
+        vectorLayer.setOpacity(this.opacity)
+        let source = vectorLayer.getSource()
+        source.forEachFeature(f => {
+          f.setStyle(new Style({
+            stroke: new Stroke({
+              color: f.getProperties().stroke,
+              width: 1,
+            }),
+            fill: new Fill({
+              color: f.getProperties().fill,
+            }),
+          }))
+        })
+      }
+      }
+    },*/
     
+
+    /*styleFeatures() {
+      this.features.getSource().getFeatures().map(feature => {
+    let r = Math.round(Math.random() * 255);
+    let g = Math.round(Math.random() * 255);
+    let b = Math.round(Math.random() * 255);
+    feature.setStyle(new Style({
+        fill: new Fill({
+           color: `rgba(${r}, ${g}, ${b}, .7)`
+        }),
+        stroke: new Stroke({
+           color: `rgb(${r}, ${g}, ${b})`
+        })
+    }))
+});
+    },*/
 
     
   }
