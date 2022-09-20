@@ -15,7 +15,9 @@
       <v-chip class="mx-2"><router-link to="/opse-galery-images-displayed-block">/opse-galery-images-displayed-block</router-link></v-chip> 
       <v-chip class="mx-2"><router-link to="/openopse-visualisation-block">/openopse-visualisation-block</router-link></v-chip>
       <v-chip class="mx-2"><router-link to="/opse-sig-visualisation-block">/opse-sig-visualisation-block</router-link></v-chip>
-
+      <v-chip class="mx-2"><router-link to="/opse-generate-thumbnails-block">/opse-generate-thumbnails-block</router-link></v-chip>
+      <v-chip class="mx-2"><router-link to="/opse-parameter-treeview-block">/opse-parameter-treeview-block</router-link></v-chip>
+      
     </div>
     <router-view></router-view>
   </v-app>

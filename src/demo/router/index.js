@@ -13,6 +13,9 @@ import opseVisualisationBlockTest from "@/demo/modules/opse-visualisation-block-
 import opseGaleryImagesDisplayedBlock from "@/demo/modules/opse-galery-images-displayed-block-test/opse-galery-images-displayed-block-test.vue";
 import openOpseVisualisationBlock from "@/demo/modules/openopse-visualisation-block-test/openopse-visualisation-block-test.vue";
 import opseSigVisualisationBlock from "@/demo/modules/opse-sig-visualisation-block-test/opse-sig-visualisation-block-test.vue";
+import OpseGenerateThumbnailsBlockTest from "@/demo/modules/opse-generate-thumbnails-block-test/opse-generate-thumbnails-block-test.vue";
+import OpseParameterTreeviewBlockTest from "@/demo/modules/opse-parameter-treeview-block-test/opse-parameter-treeview-block-test.vue";
+
 
 Vue.use(VueRouter)
 
@@ -63,7 +66,16 @@ const routes = [
 {
     path:"/opse-sig-visualisation-block",
     component: opseSigVisualisationBlock,
-}
+},
+{
+    path:"/opse-generate-thumbnails-block",
+    component: OpseGenerateThumbnailsBlockTest,
+},
+{
+    path:"/opse-parameter-treeview-block",
+    component: OpseParameterTreeviewBlockTest,
+},
+
 ];
 
 const router = new VueRouter({
