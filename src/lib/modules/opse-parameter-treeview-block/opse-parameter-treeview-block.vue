@@ -1,20 +1,36 @@
 <i18n  >
 {
   "en": {
-    "opseParameter": "Parameter"
+    "opseParameter": "Parameters",
+    "shortName" : "Short name : ",
+    "longName": "Long name : ",
+    "unitOfMeasure": "Unit of measure : ",
+    "comments": "Comments : "
       
   },
   "fr": {
-     "opseParameter": "Paramètre" 
+     "opseParameter": "Paramètres",
+     "shortName" : "Nom court : ",
+     "longName": "Nom long : ",
+     "unitOfMeasure": "Unité de mesure : ",
+     "comments": "Commentaires : "
   }
 }
 </i18n>
 
 <template>
-  <v-card v-if="isVisible" :style="applyTheme" :flat="true">
+  <v-card v-if="isVisible && !isEditing" :style="applyTheme" :flat="true">
+    <v-card-title>
+    <v-icon large left style="color:#F39C12">mdi-thermometer</v-icon>
+    <span>{{ $t('opseParameter') }}</span>
+  </v-card-title>
+  <v-card-text>
     <div>
-      <v-treeview :items="param"></v-treeview>
+      <v-treeview  hoverable dense expand-icon="mdi-chevron-down" :items="param">
+        
+      </v-treeview>
     </div>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -29,15 +45,8 @@ export default {
       children: [],
       parent: [],
       id: "",
-      param: [{
-        name: 'Applications :',
-        children: [
-          { id: 2, name: 'Calendar : app' },
-          { id: 3, name: 'Chrome : app' },
-          { id: 4, name: 'Webstorm : app' },
-        ],
-      },],
-      name: "name",
+      param: [],
+      
     };
   },
 
@@ -63,6 +72,11 @@ export default {
         return {};
       },
     },
+
+    visibleOnlyOnConsultation:{
+      type:String,
+      default: "",
+    }
   },
 
   computed: {
@@ -72,7 +86,7 @@ export default {
 
     isVisible() {
       let isVisible = false;
-      if (this.links != null && this.links.length > 0) {
+      if (this.links != null && this.links.length > 0 && this.visibleOnlyOnConsultation=== "true") {
         isVisible = true;
       }
       this.$emit("getVisibility", {
@@ -106,6 +120,10 @@ export default {
       }
       return false;
     },
+
+    isEditing() { 
+  return this.$store.getters.getIsUserEditingSheet;
+}
   },
 
   watch: {
@@ -120,6 +138,7 @@ export default {
   created() {
     this.$i18n.locale = this.language;
     this.loadData();
+    console.log("visibleOnlyOnConsultation ", this.visibleOnlyOnConsultation)
   },
 
   methods: {
@@ -170,7 +189,8 @@ export default {
       var newArrays = [];
       var indexs= [];
       for (var i = 0; i < data.length; i++) {
-        var parent = data[i].thesaurusCode;
+        var parent = this.getThesaurusLabel(data[i].thesaurusCode);
+       //var parent = data[i].thesaurusCode;
         if (!newArrays[parent]) {
           indexs.push(parent);
           newArrays[parent] = {
@@ -181,10 +201,10 @@ export default {
 
         let subItem = { name: data[i].longName, 
         children: [
-            {name : 'shortName : ' +data[i].shortName},
-            {name : 'longName : ' +data[i].longName},
-            {name : 'unit of measure : ' +data[i].uom},
-            {name : 'comments en : ' +(data[i].comment.en==null?"":data[i].comment.en)}
+            {name : this.$t('shortName') +data[i].shortName},
+            {name : this.$t('longName') +data[i].longName},
+            {name : this.$t('unitOfMeasure') +data[i].uom},
+            {name : this.$t('comments') +(data[i].comment.en==null?"":data[i].comment.en)}
         ]
         };
 
@@ -194,8 +214,34 @@ export default {
       for (var j = 0; j < indexs.length; j++) {
           results.push(newArrays[indexs[j]]);
       }
-      console.log(results);
+      //console.log(results);
       return results;
+    },
+
+    getThesaurusLabel(keyword){
+      var split = [];
+      split = keyword.split(".")
+      var value = []
+      for (var i=0; i<split.length; i++){
+        value.push(split[i].trim().toUpperCase() )
+      }
+      
+      var result = []
+      
+     
+      if (value[0] != "NULL" && value[1] == "NULL" && value[2] == "NULL" && value[3] == "NULL"){
+        result.push(value[0])
+      }
+      if (value[0] != "NULL" && value[1] != "NULL" && value[2] == "NULL" && value[3] == "NULL"){
+        result.push(value[1])
+      }
+      if (value[0] != "NULL" && value[1] != "NULL" && value[2] != "NULL" && value[3] == "NULL"){
+        result.push(value[2])
+      }
+      if (value[0] != "NULL" && value[1] != "NULL" && value[2] != "NULL" && value[3] != "NULL"){
+        result.push(value[3])
+      }
+      return result
     },
 
     displayError: function (message) {
@@ -207,3 +253,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.large {
+  font-size: 20px;
+  font-weight: 700;
+}
+</style>
