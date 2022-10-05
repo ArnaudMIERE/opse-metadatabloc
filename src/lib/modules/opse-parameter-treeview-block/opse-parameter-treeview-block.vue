@@ -73,7 +73,7 @@ export default {
       },
     },
 
-    visibleOnlyOnConsultation:{
+    visibleOnlyOn:{
       type:String,
       default: "",
     }
@@ -85,8 +85,9 @@ export default {
     },
 
     isVisible() {
+      console.log("this.param.length ", this.param.length)
       let isVisible = false;
-      if (this.links != null && this.links.length > 0 && this.visibleOnlyOnConsultation=== "true") {
+      if (this.links != null && this.links.length > 0 && this.visibleOnlyOn=== "consultation" && this.param!= null && this.param.length >0) {
         isVisible = true;
       }
       this.$emit("getVisibility", {
@@ -138,7 +139,7 @@ export default {
   created() {
     this.$i18n.locale = this.language;
     this.loadData();
-    console.log("visibleOnlyOnConsultation ", this.visibleOnlyOnConsultation)
+    console.log("visibleOnlyOn ", this.visibleOnlyOn)
   },
 
   methods: {
@@ -189,7 +190,7 @@ export default {
       var newArrays = [];
       var indexs= [];
       for (var i = 0; i < data.length; i++) {
-        var parent = this.getThesaurusLabel(data[i].thesaurusCode);
+        var parent = this.getThesaurusLabel(data[i].label);
        //var parent = data[i].thesaurusCode;
         if (!newArrays[parent]) {
           indexs.push(parent);
