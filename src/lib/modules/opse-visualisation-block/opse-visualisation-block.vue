@@ -48,8 +48,30 @@
         <v-icon large left style="color: #f39c12"
           >mdi-chart-timeline-variant</v-icon
         >
-        <span>{{ $t("blocTitle") }}</span>
+        <span>{{ $t("blocTitle") }}  
+           <v-tooltip right color="">
+            <template v-slot:activator="{ on, attrs }">
+          <v-icon
+          style="color: #f39c12"
+          v-bind="attrs"
+            v-on="on"
+          >
+          mdi-help-circle-outline
+          </v-icon>
+          </template>
+          <span>
+    <b>For data from instrumented series</b>:
+      To preview these data sets, select one or more parameters, and/or a date.<br/>The curve of the selected data appears on the graph. It is possible to zoom on this curve.
+          </span>
+           </v-tooltip>
+
+        </span>
+        
+       
       </v-card-title>
+      
+
+      
       <v-card-text v-if="years.length > 0">
         <!-- <div v-if="locations.length==0">
     No location
@@ -139,6 +161,7 @@ export default {
       years: [],
       pivots: [],
       chartOptions: null,
+      isHidden: false
     };
   },
 

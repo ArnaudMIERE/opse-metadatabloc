@@ -22,7 +22,25 @@
 <v-card v-if="isVisible" :style="applyTheme" :flat="true">
     <v-card-title>
       <v-icon large left>mdi-earth</v-icon>
-      <span>{{ $t('opseVisualisation') }}</span>
+      <span>{{ $t('opseVisualisation') }}
+        <v-tooltip right color="">
+            <template v-slot:activator="{ on, attrs }">
+          <v-icon
+          style="color: #f39c12"
+          v-bind="attrs"
+            v-on="on"
+          >
+          mdi-help-circle-outline
+          </v-icon>
+          </template>
+          <span>
+    <b>For geo-referenced data (shapefile/raster)</b>:
+      The preview of the geo-referenced data appears on a map. If the data is for one year only, there is no choice for the preview. If the data concern several years, it is possible to select them on the frieze above the map to preview them directly on the map.
+          </span>
+           </v-tooltip>
+
+
+      </span>
     </v-card-title> 
 
     <p>
