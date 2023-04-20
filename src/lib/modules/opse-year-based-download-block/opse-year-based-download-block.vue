@@ -128,14 +128,14 @@
       <v-btn
         color="warning"
         class="ma-4"
-        @click="downloadAll(folderFile)"
+        @click="downloadAll(folderFile); mailDownload();"
         :disabled="!url || downloadAllowed || !dataPolicy"
         >{{ $t("downloadAll") }}</v-btn
       >
       <v-btn
         color="warning"
         class="ma-4"
-        @click="downloadSelected(folderFile)"
+        @click="downloadSelected(folderFile); mailDownload();"
         :disabled="!url || selectedYears.length == 0 || downloadAllowed"
         >{{ $t("downloadSelected") }}</v-btn
       >
@@ -158,6 +158,8 @@ export default {
       currentStatus: "PREPARING_REQUEST",
       url: null,
       folderFile: "/data/netcdf",
+      email:[],
+      message:""
     };
   },
 
@@ -224,9 +226,55 @@ export default {
     this.$i18n.locale = this.language;
     //this.loadYears()
     this.file();
+    this.loadEmail();
   },
 
   methods: {
+
+
+    
+    mailDownload: function(){
+      console.log("service ",this.url)
+      
+      this.axios({
+        method:"post",
+        url:this.url+"contact/send?email="+this.email+"&resourceTitle="+ this.metadata.resourceTitle.en, 
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'Bearer '},
+      }).then(response=>{
+         console.log(response.data)
+                 
+      }).catch(error=>{
+        console.log("An error has occured:" + error)
+      })
+     
+    },
+
+
+    
+
+    loadEmail(){
+     
+      var mail= []
+      for (let i =0; i < this.metadata.contacts.length; i++){
+        console.log("Contacte "+this.metadata.contacts[i].email, i)
+        if (this.metadata.contacts[i].roles == "pointofcontact"){
+        console.log("Contact "+this.metadata.contacts[i].email)
+       
+        mail = this.email.push(this.metadata.contacts[i].email)
+         
+        }
+
+        if (this.metadata.contacts[i].roles == "principalinvestigator"){
+        console.log("Contact "+this.metadata.contacts[i].email)
+       
+        mail = this.email.push(this.metadata.contacts[i].email)
+         
+        }
+        
+      }
+      return mail;
+    },
+
     file() {
       this.loadYears(this.folderFile);
     },

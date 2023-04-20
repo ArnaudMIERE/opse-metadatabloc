@@ -15,6 +15,7 @@ import openOpseVisualisationBlock from "@/demo/modules/openopse-visualisation-bl
 import opseSigVisualisationBlock from "@/demo/modules/opse-sig-visualisation-block-test/opse-sig-visualisation-block-test.vue";
 import OpseGenerateThumbnailsBlockTest from "@/demo/modules/opse-generate-thumbnails-block-test/opse-generate-thumbnails-block-test.vue";
 import OpseParameterTreeviewBlockTest from "@/demo/modules/opse-parameter-treeview-block-test/opse-parameter-treeview-block-test.vue";
+import OpseAcknowledgementsBlockTest from "@/demo/modules/opse-acknowledgements -block-test/opse-acknowledgements-block-test.vue";
 
 
 Vue.use(VueRouter)
@@ -74,6 +75,10 @@ const routes = [
 {
     path:"/opse-parameter-treeview-block",
     component: OpseParameterTreeviewBlockTest,
+},
+{
+    path:"/opse-acknowledgements-block",
+    component: OpseAcknowledgementsBlockTest,
 },
 
 ];

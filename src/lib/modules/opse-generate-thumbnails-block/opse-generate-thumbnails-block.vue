@@ -10,7 +10,7 @@
        "opseConfirm": "Confirm",
        "opseCancel": "Cancel",
        "opseSelectFile": "Select files",
-       "opseListFile": "List of files",
+       "opseListFile": "Generate Thumbnails",
        "opseUpload": "Upload"
   },
   "fr": {
@@ -23,7 +23,7 @@
       "opseConfirm": "Confirmer",
       "opseCancel": "Annuler",
       "opseSelectFile": "Sélectionnez des fichiers",
-      "opseListFile": "Liste de fichiers",
+      "opseListFile": "Générer des miniatures",
       "opseUpload": "Upload"
   }
 }
@@ -66,15 +66,15 @@
 
     <v-card v-if="isVisible" :style="applyTheme" max-width="600">
     <v-card-title>
-        <v-icon large left style="color:#F39C12">mdi-file</v-icon>{{$t('opseListFile')}}
+        <v-icon large left style="color:#F39C12">mdi-image</v-icon>{{$t('opseListFile')}}
       <v-spacer></v-spacer>
-      <v-text-field
+      <!--v-text-field
         v-model="search"
         append-icon="mdi-magnify"
         label="Search"
         single-line
         hide-details
-      ></v-text-field>
+      ></v-text-field-->
     </v-card-title>
     <v-radio-group v-model="folderFile" row>
         <v-radio
@@ -97,20 +97,31 @@
       :headers="headers"
       :items="dataFile"
       :search="search"
-      class="elevation-1"
     >
     
 
     <template v-slot:item="{item}">
         <tr>
-            <td class="dense text-xs-left">
+            <td >
                 {{item.name}}
                 <span></span>
             </td>
-            <td>
-                <v-btn small outlined color="success" @click="convertMMEtoPNG">{{ $t('opseConvert') }}</v-btn>
-
-                <v-btn icon @click="confirmDeletion(item.name)"><v-icon color="error" title="Delete" >  mdi-trash-can </v-icon></v-btn>
+             
+            <td v-if="item.name && folderFile==='/data/tiff/RGB'">
+            
+               <v-btn icon title="Generate Thumbnails " :loading="loading" @click="convertRGBtoPNG()"><v-icon  color="success">mdi-script-text-play</v-icon></v-btn>
+               <v-btn icon @click="confirmeDelete(item.name)"><v-icon color="error" title="Delete">mdi-delete-empty</v-icon></v-btn>
+               <span v-if="check"><v-icon right   title="Done">mdi-check</v-icon></span>
+            </td>
+            <td v-if="item.name && folderFile==='/data/tiff/MS'">
+               <v-btn icon title="Generate Thumbnails " :loading="loading" @click="convertMStoPNG()"><v-icon  color="success">mdi-script-text-play</v-icon></v-btn>
+               <v-btn icon @click="confirmeDelete(item.name)"><v-icon color="error" title="Delete">mdi-delete-empty</v-icon></v-btn>
+               <span v-if="check"><v-icon right   title="Done">mdi-check</v-icon></span>
+            </td>
+            <td v-if="item.name && folderFile==='/data/tiff/MNE'">
+                <v-btn icon title="Generate Thumbnails " :loading="loading" @click="convertMMEtoPNG()"><v-icon  color="success">mdi-script-text-play</v-icon></v-btn>
+               <v-btn icon title="Delete" @click="confirmeDelete(item.name)"><v-icon  color="error" title="Delete">mdi-delete-empty</v-icon></v-btn>
+              <span v-if="check"><v-icon right   title="Done">mdi-check</v-icon></span>
             </td>
         </tr>
     </template>
@@ -118,10 +129,7 @@
     
     
     </v-data-table>
-    <v-card-actions>
-          <v-spacer></v-spacer>
-     <v-btn color="error" dark @click="deletionDialogAll=true"> <v-icon dark left title="Delete all" @click="deletionDialogAll=true">  mdi-trash-can </v-icon>{{$t('opseDelete')}}</v-btn>
-    </v-card-actions>
+    
   </v-card>
   </v-app>
   
@@ -139,7 +147,7 @@ export default {
         datasetFileInput: "",
         search: '',
         dataFile:[],
-        fileName:'',
+        fileName:'/data/tiff/MNE/',
         deletionDialog:false,
         deletionDialogAll: false,
         headers: [
@@ -151,6 +159,8 @@ export default {
         notifierColor: 'success',
         timeout:2000,
         folderFile: "/data/tiff/RGB",
+        loading:false,
+        check:false
 
         }
     },
@@ -225,21 +235,25 @@ export default {
       this.$i18n.locale = value;
     },
     metadata(){
-        this.loadData();
+        this.loadData(this.folderFile);
     }
   },
 
   created() {
    this.$i18n.locale = this.language;
-   this.loadData();
-   this.file();
+   //this.loadData(this.folderFile);
+   //this.file();
+  },
+
+  mounted: function(){
+    this.loadData(this.folderFile);
   },
 
   methods: {
 
-    file() {
+   /* file() {
       this.loadData(this.folderFile);
-    },
+    },*/
 
     confirmDeletion(file) {
     this.fileName = file,
@@ -272,6 +286,24 @@ export default {
         console.log("Liste de fichiers",response.data)
         
           }
+      })
+      .finally(() => {
+          this.loading = false
+      });
+
+    },
+
+    convertMMEtoPNG(){
+      this.loading=true
+      this.axios({
+        method: "get",
+        url: this.url + "/mmetopng?collection="+this.metadata.id,
+      }).then(response => {
+          if (response){
+        this.check=true
+        this.displaySuccess("File has been converted")
+        
+          }
       }).catch((error) => {
         this.displayError("An error has occured:" + error)
         console.log(error)
@@ -280,13 +312,34 @@ export default {
       .finally(() => {
           this.loading = false
       });
-
     },
 
-    convertMMEtoPNG(){
+    convertRGBtoPNG(){
+      this.loading=true
       this.axios({
         method: "get",
-        url: this.url + "/mmetopng?collection="+this.metadata.id,
+        url: this.url + "/rgbtopng?collection="+this.metadata.id,
+      }).then(response => {
+          if (response){
+            this.check=true
+        this.displaySuccess("File has been converted")
+        
+          }
+      }).catch((error) => {
+        this.displayError("An error has occured:" + error)
+        console.log(error)
+        
+        })
+      .finally(() => {
+          this.loading = false
+      });
+    },
+
+    convertMStoPNG(){
+      this.loading=true
+      this.axios({
+        method: "get",
+        url: this.url + "/mstopng?collection="+this.metadata.id,
       }).then(response => {
           if (response){
         this.displaySuccess("File has been converted")
@@ -302,16 +355,16 @@ export default {
       });
     },
 
-    confirmeDelete(){
-      console.log(this.url + "/delete?collection="+this.metadata.id+"&fileName="+this.fileName)
+    confirmeDelete(file){
       this.axios({
         method: "delete",
-        url: this.url + "/delete?collection="+this.metadata.id+"&fileName="+this.fileName,
+        url: this.url + "/delete?collection="+this.metadata.id+"&folder="+this.folderFile+"&fileName="+file,
       }).then(response => {
         if (response)
-          this.displaySuccess("File deleted")
-          this.loadData();
+          this.displaySuccess(file+" has been deleted")
+          
           this.deletionDialog=false
+           this.loadData(this.folderFile);
       }).catch((error) => {
         this.displayError("An error has occured:" + error)
         console.log(error)

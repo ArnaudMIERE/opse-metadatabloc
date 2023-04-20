@@ -195,6 +195,7 @@ export default {
       itemsName: [],
       listCount: 0,
       pageSize: 4,
+      email:[],
     };
   },
 
@@ -268,9 +269,50 @@ export default {
     this.file();
     this.initPage();
     this.updatePage(this.page);
+    this.loadEmail();
   },
 
   methods: {
+
+    mailDownload: function(){
+      console.log("service ",this.url)
+      
+      this.axios({
+        method:"post",
+        url:this.url+"contact/send?email="+this.email+"&resourceTitle="+ this.metadata.resourceTitle.en, 
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'Bearer '},
+      }).then(response=>{
+         console.log(response.data)
+                 
+      }).catch(error=>{
+        console.log("An error has occured:" + error)
+      })
+     
+    },
+
+
+
+    loadEmail(){
+     
+      var mail= []
+      for (let i =0; i < this.metadata.contacts.length; i++){
+        
+        if (this.metadata.contacts[i].roles == "pointofcontact"){    
+       
+        mail = this.email.push(this.metadata.contacts[i].email)
+         
+        }
+
+        if (this.metadata.contacts[i].roles == "principalinvestigator"){
+        mail = this.email.push(this.metadata.contacts[i].email)
+         
+        }
+        
+      }
+      return mail;
+    },
+
+
     file() {
       this.loadImage(this.folderFile);
     },

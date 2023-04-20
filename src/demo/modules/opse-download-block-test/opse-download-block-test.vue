@@ -14,14 +14,15 @@ export default {
     data(){
         return{
         metadata1: {
-        links:[
-          {type:"HTTP_DOWNLOAD_LINK",
-           //url:"https://services.sedoo.fr/opse/data/v1_0/download?collectionId=",
-           url: "http://localhost:8604/data/download?collectionId=389bbea0-7279-12c1-63d0-cfc4a77ded87",
+        id: "389bbea0-7279-12c1-63d0-cfc4a77ded87",
+       links:[
+          {type:"OPENSEARCH_LINK",
+           url:"http://localhost:8604/",
            name:"",
-           description: null
-          },
-          ]
+           description:{en:"Visualisation of land use data, Houay Pano, Laos"}
+          }
+          ],
+          
         },
         theme: {
         primaryColor: "#f39c12",

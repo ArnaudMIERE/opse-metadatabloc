@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       metadata1: {
-        id: "3d768089-1b12-426e-955f-f276c05f6622",
+        id: "36064eb9-c781-4a5d-a8f2-1e80cd8dc121",
         links: [
           {
             type: "OPENSEARCH_LINK",
@@ -54,6 +54,115 @@ export default {
             label: "Land Surface.Soils.Soil Temperature.null",
           },
         ],
+
+        "contacts" : [ 
+        {
+            "firstName" : "",
+            "lastName" : "",
+            "name" : "SEDOO",
+            "nameType" : "Organizational",
+            "email" : "contact@sedoo.fr",
+            "organisation" : "",
+            "organisations" : [],
+            "comment" : {
+                "en" : "",
+                "fr" : ""
+            },
+            "address" : {
+                "street" : "",
+                "city" : "",
+                "postalCode" : "",
+                "country" : ""
+            },
+            "roles" : [ 
+                "metadatapointofcontact"
+            ],
+            "orcId" : "",
+            "ror" : "",
+            "webSiteUrl" : "https://www.sedoo.fr",
+            "temporalExtents" : [ 
+                {
+                    "beginDate" : "",
+                    "endDate" : "now",
+                    "comment" : null
+                }
+            ]
+        }, 
+        {
+            "firstName" : "Arnaud",
+            "lastName" : "MIERE",
+            "name" : "",
+            "nameType" : "Personal",
+            "email" : "arnaud_salsero@yahoo.fr",
+            "organisation" : "",
+            "organisations" : [ 
+                {
+                    "name" : "IRD",
+                    "country" : "France"
+                }
+            ],
+            "comment" : {
+                "en" : "",
+                "fr" : ""
+            },
+            "address" : {
+                "street" : "",
+                "city" : "",
+                "postalCode" : "",
+                "country" : ""
+            },
+            "roles" : [ 
+                "pointofcontact"
+            ],
+            "orcId" : "",
+            "ror" : "",
+            "webSiteUrl" : "",
+            "temporalExtents" : [ 
+                {
+                    "beginDate" : "",
+                    "endDate" : "now",
+                    "comment" : null
+                }
+            ]
+        }, 
+        {
+            "firstName" : "Mobalie",
+            "lastName" : "Danger",
+            "name" : "",
+            "nameType" : "Personal",
+            "email" : "mobalie@gmx.com",
+            "organisation" : "",
+            "organisations" : [],
+            "comment" : {
+                "en" : "",
+                "fr" : ""
+            },
+            "address" : {
+                "street" : "",
+                "city" : "",
+                "postalCode" : "",
+                "country" : ""
+            },
+            "roles" : [ 
+                "principalinvestigator"
+            ],
+            "orcId" : "",
+            "ror" : "",
+            "webSiteUrl" : "",
+            "temporalExtents" : [ 
+                {
+                    "beginDate" : "",
+                    "endDate" : "now",
+                    "comment" : null
+                }
+            ]
+        }
+    ],
+
+    "resourceTitle" : {
+        "en" : "Test mail Arnaud",
+        "fr" : "Copie de Répartition de la culture de l'embouche bovine par village de l'OPSE en 2012"
+    },
       },
       theme: {
         primaryColor: "#f39c12",

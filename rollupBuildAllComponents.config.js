@@ -10,7 +10,14 @@ const postcss = require("rollup-plugin-postcss");
 const ComponentVue = [
     //"./src/lib/modules/myproject-fake-block/myproject-fake-block.vue",
     //"./src/lib/modules/opse-datasetname-block/opse-datasetname-block.vue",
-    "./src/lib/modules/opse-sig-visualisation-block/opse-sig-visualisation-block.vue",
+    //"./src/lib/modules/opse-sig-visualisation-block/opse-sig-visualisation-block.vue",
+    //"./src/lib/modules/opse-parameter-treeview-block/opse-parameter-treeview-block.vue",
+    //"./src/lib/modules/opse-download-block/opse-download-block.vue",
+    //"./src/lib/modules/opse-sig-visualisation-block/opse-sig-visualisation-block.vue",
+    //"./src/lib/modules/opse-generate-thumbnails-block/opse-generate-thumbnails-block.vue",
+    //"./src/lib/modules/opse-year-based-download-block/opse-year-based-download-block.vue",
+    "./src/lib/modules/opse-thumbnails-displayed-block/opse-thumbnails-displayed-block.vue",
+    
 ];
 
 const confFile = ComponentVue.map(componentpath => {
